@@ -694,6 +694,269 @@
             Additional payment details or notes
             </summary>
         </member>
+        <member name="T:Ecommerce.Api.Controllers.CategoriesController">
+            <summary>
+            API controller for managing product categories
+            </summary>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.GetAll(Ecommerce.Api.Contracts.PagedRequest)">
+            <summary>
+            Gets all categories with pagination
+            </summary>
+            <param name="request">Pagination parameters</param>
+            <returns>Paginated list of categories</returns>
+            <response code="200">Returns the paginated list of categories</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.GetAllSimple">
+            <summary>
+            Gets all categories without pagination
+            </summary>
+            <returns>List of all categories</returns>
+            <response code="200">Returns all categories</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.GetById(System.Int32)">
+            <summary>
+            Gets a specific category by ID
+            </summary>
+            <param name="id">Category ID</param>
+            <returns>Category details</returns>
+            <response code="200">Returns the category</response>
+            <response code="404">Category not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.Create(Ecommerce.Api.Contracts.CreateCategoryDto)">
+            <summary>
+            Creates a new category
+            </summary>
+            <param name="dto">Category creation data</param>
+            <returns>Created category</returns>
+            <response code="201">Category created successfully</response>
+            <response code="400">Invalid data provided</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.Update(System.Int32,Ecommerce.Api.Contracts.UpdateCategoryDto)">
+            <summary>
+            Updates an existing category
+            </summary>
+            <param name="id">Category ID</param>
+            <param name="dto">Category update data</param>
+            <returns>Updated category</returns>
+            <response code="200">Category updated successfully</response>
+            <response code="400">Invalid data provided</response>
+            <response code="404">Category not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.Delete(System.Int32)">
+            <summary>
+            Soft deletes a category
+            </summary>
+            <param name="id">Category ID</param>
+            <returns>No content</returns>
+            <response code="204">Category deleted successfully</response>
+            <response code="404">Category not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.CategoriesController.Restore(System.Int32)">
+            <summary>
+            Restores a soft-deleted category
+            </summary>
+            <param name="id">Category ID</param>
+            <returns>No content</returns>
+            <response code="204">Category restored successfully</response>
+            <response code="404">Category not found</response>
+        </member>
+        <member name="T:Ecommerce.Api.Controllers.ProductsController">
+            <summary>
+            API controller for managing products
+            </summary>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.GetAll(Ecommerce.Api.Contracts.PagedRequest,System.Nullable{System.Int32},System.String,System.Nullable{System.Boolean})">
+            <summary>
+            Gets all products with pagination and filtering
+            </summary>
+            <param name="request">Pagination parameters</param>
+            <param name="categoryId">Optional category filter</param>
+            <param name="searchTerm">Optional search term</param>
+            <param name="isActive">Optional active status filter</param>
+            <returns>Paginated list of products</returns>
+            <response code="200">Returns the paginated list of products</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.GetById(System.Int32)">
+            <summary>
+            Gets a specific product by ID
+            </summary>
+            <param name="id">Product ID</param>
+            <returns>Product details</returns>
+            <response code="200">Returns the product</response>
+            <response code="404">Product not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.GetBySku(System.String)">
+            <summary>
+            Gets a product by SKU
+            </summary>
+            <param name="sku">Product SKU</param>
+            <returns>Product details</returns>
+            <response code="200">Returns the product</response>
+            <response code="404">Product not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.GetLowStock(System.Int32)">
+            <summary>
+            Gets products with low stock
+            </summary>
+            <param name="threshold">Stock threshold (default 10)</param>
+            <returns>List of low stock products</returns>
+            <response code="200">Returns low stock products</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.GetByCategory(System.Int32)">
+            <summary>
+            Gets products by category
+            </summary>
+            <param name="categoryId">Category ID</param>
+            <returns>List of products in the category</returns>
+            <response code="200">Returns products in the category</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.GetPriceHistory(System.Int32)">
+            <summary>
+            Gets price history for a product
+            </summary>
+            <param name="id">Product ID</param>
+            <returns>Price history entries</returns>
+            <response code="200">Returns price history</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.Create(Ecommerce.Api.Contracts.CreateProductDto)">
+            <summary>
+            Creates a new product
+            </summary>
+            <param name="dto">Product creation data</param>
+            <returns>Created product</returns>
+            <response code="201">Product created successfully</response>
+            <response code="400">Invalid data provided</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.Update(System.Int32,Ecommerce.Api.Contracts.UpdateProductDto)">
+            <summary>
+            Updates an existing product
+            </summary>
+            <param name="id">Product ID</param>
+            <param name="dto">Product update data</param>
+            <returns>Updated product</returns>
+            <response code="200">Product updated successfully</response>
+            <response code="400">Invalid data provided</response>
+            <response code="404">Product not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.UpdateStock(System.Int32,Ecommerce.Api.Contracts.UpdateStockDto)">
+            <summary>
+            Updates product stock quantity
+            </summary>
+            <param name="id">Product ID</param>
+            <param name="dto">Stock update data</param>
+            <returns>Updated product</returns>
+            <response code="200">Stock updated successfully</response>
+            <response code="400">Invalid data provided</response>
+            <response code="404">Product not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.Delete(System.Int32)">
+            <summary>
+            Soft deletes a product
+            </summary>
+            <param name="id">Product ID</param>
+            <returns>No content</returns>
+            <response code="204">Product deleted successfully</response>
+            <response code="404">Product not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.ProductsController.Restore(System.Int32)">
+            <summary>
+            Restores a soft-deleted product
+            </summary>
+            <param name="id">Product ID</param>
+            <returns>No content</returns>
+            <response code="204">Product restored successfully</response>
+            <response code="404">Product not found</response>
+        </member>
+        <member name="T:Ecommerce.Api.Controllers.SalesController">
+            <summary>
+            API controller for managing sales transactions
+            </summary>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.GetAll(Ecommerce.Api.Contracts.PagedRequest,System.String,System.String)">
+            <summary>
+            Gets all sales with pagination and filtering
+            </summary>
+            <param name="request">Pagination parameters</param>
+            <param name="status">Optional status filter</param>
+            <param name="customerName">Optional customer name filter</param>
+            <returns>Paginated list of sales</returns>
+            <response code="200">Returns the paginated list of sales</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.GetById(System.Int32)">
+            <summary>
+            Gets a specific sale by ID
+            </summary>
+            <param name="id">Sale ID</param>
+            <returns>Sale details</returns>
+            <response code="200">Returns the sale</response>
+            <response code="404">Sale not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.GetByDateRange(System.DateTime,System.DateTime)">
+            <summary>
+            Gets sales within a date range
+            </summary>
+            <param name="startDate">Start date</param>
+            <param name="endDate">End date</param>
+            <returns>List of sales in the date range</returns>
+            <response code="200">Returns sales in the date range</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.GetSummary">
+            <summary>
+            Gets sales summary statistics
+            </summary>
+            <returns>Sales summary data</returns>
+            <response code="200">Returns sales summary</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.Create(Ecommerce.Api.Contracts.CreateSaleDto)">
+            <summary>
+            Creates a new sale
+            </summary>
+            <param name="dto">Sale creation data</param>
+            <returns>Created sale</returns>
+            <response code="201">Sale created successfully</response>
+            <response code="400">Invalid data provided</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.Update(System.Int32,Ecommerce.Api.Contracts.UpdateSaleDto)">
+            <summary>
+            Updates an existing sale
+            </summary>
+            <param name="id">Sale ID</param>
+            <param name="dto">Sale update data</param>
+            <returns>Updated sale</returns>
+            <response code="200">Sale updated successfully</response>
+            <response code="400">Invalid data provided</response>
+            <response code="404">Sale not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.Complete(System.Int32)">
+            <summary>
+            Completes a pending sale
+            </summary>
+            <param name="id">Sale ID</param>
+            <returns>No content</returns>
+            <response code="204">Sale completed successfully</response>
+            <response code="404">Sale not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.Cancel(System.Int32)">
+            <summary>
+            Cancels a sale
+            </summary>
+            <param name="id">Sale ID</param>
+            <returns>No content</returns>
+            <response code="204">Sale cancelled successfully</response>
+            <response code="404">Sale not found</response>
+        </member>
+        <member name="M:Ecommerce.Api.Controllers.SalesController.AddPayment(System.Int32,Ecommerce.Api.Contracts.CreatePaymentInfoDto)">
+            <summary>
+            Adds payment information to a sale
+            </summary>
+            <param name="id">Sale ID</param>
+            <param name="dto">Payment information</param>
+            <returns>No content</returns>
+            <response code="204">Payment added successfully</response>
+            <response code="400">Invalid data provided</response>
+            <response code="404">Sale not found</response>
+        </member>
         <member name="T:Ecommerce.Api.Data.AppDbContext">
             <summary>
             Database context for the E-commerce application
@@ -1322,6 +1585,18 @@
             <param name="parameter">The parameter expression</param>
             <param name="propertyPath">The property path (e.g., "Category.Name")</param>
             <returns>Property expression or null if not found</returns>
+        </member>
+        <member name="T:Ecommerce.Api.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:Ecommerce.Api.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ecommerce.Api.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ecommerce.Api.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
         </member>
         <member name="T:Ecommerce.Api.Services.CategoryService">
             <summary>

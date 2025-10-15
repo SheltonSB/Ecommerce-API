@@ -207,12 +207,14 @@ public class AppDbContext : DbContext
     /// </summary>
     private static void SeedData(ModelBuilder modelBuilder)
     {
+        var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         // Seed Categories
         modelBuilder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "Electronics", Description = "Electronic devices and accessories", CreatedAt = DateTime.UtcNow },
-            new Category { Id = 2, Name = "Clothing", Description = "Apparel and fashion items", CreatedAt = DateTime.UtcNow },
-            new Category { Id = 3, Name = "Books", Description = "Books and educational materials", CreatedAt = DateTime.UtcNow },
-            new Category { Id = 4, Name = "Home & Garden", Description = "Home improvement and garden supplies", CreatedAt = DateTime.UtcNow }
+            new Category { Id = 1, Name = "Electronics", Description = "Electronic devices and accessories", CreatedAt = seedDate },
+            new Category { Id = 2, Name = "Clothing", Description = "Apparel and fashion items", CreatedAt = seedDate },
+            new Category { Id = 3, Name = "Books", Description = "Books and educational materials", CreatedAt = seedDate },
+            new Category { Id = 4, Name = "Home & Garden", Description = "Home improvement and garden supplies", CreatedAt = seedDate }
         );
 
         // Seed Products
@@ -226,7 +228,7 @@ public class AppDbContext : DbContext
                 Sku = "PHONE-001", 
                 StockQuantity = 50, 
                 CategoryId = 1,
-                CreatedAt = DateTime.UtcNow 
+                CreatedAt = seedDate 
             },
             new Product 
             { 
@@ -237,7 +239,7 @@ public class AppDbContext : DbContext
                 Sku = "LAPTOP-001", 
                 StockQuantity = 25, 
                 CategoryId = 1,
-                CreatedAt = DateTime.UtcNow 
+                CreatedAt = seedDate 
             },
             new Product 
             { 
@@ -248,7 +250,7 @@ public class AppDbContext : DbContext
                 Sku = "TSHIRT-001", 
                 StockQuantity = 100, 
                 CategoryId = 2,
-                CreatedAt = DateTime.UtcNow 
+                CreatedAt = seedDate 
             },
             new Product 
             { 
@@ -259,7 +261,7 @@ public class AppDbContext : DbContext
                 Sku = "BOOK-001", 
                 StockQuantity = 75, 
                 CategoryId = 3,
-                CreatedAt = DateTime.UtcNow 
+                CreatedAt = seedDate 
             }
         );
     }

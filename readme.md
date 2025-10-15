@@ -1,332 +1,102 @@
-# 🚀 E-commerce API - Enterprise-Grade Solution
+Of course. Here is the revised version with the bold formatting removed from the text.
 
-A comprehensive, production-ready E-commerce API built with **ASP.NET Core 9**, featuring clean architecture, comprehensive testing, and enterprise-grade features that demonstrate advanced software engineering principles.
+-----
 
-## ✨ Key Features
+# Enterprise E-commerce API
 
-### 🏗️ **Clean Architecture & Design Patterns**
-- **Domain-Driven Design (DDD)** with rich domain models
-- **Repository Pattern** with Entity Framework Core
-- **Dependency Injection** throughout the application
-- **CQRS-inspired** service layer separation
-- **SOLID Principles** implementation
+A production-grade RESTful API for an e-commerce platform, built with ASP.NET Core 9. This project is designed following Clean Architecture and Domain-Driven Design (DDD) principles to ensure a scalable, maintainable, and thoroughly testable codebase. The solution demonstrates advanced software engineering practices suitable for enterprise-level applications, focusing on separation of concerns, data integrity, and robust performance.
 
-### 🔒 **Enterprise-Grade Security & Data Integrity**
-- **Soft Delete** functionality for data preservation
-- **Comprehensive validation** with FluentValidation
-- **Global exception handling** with structured logging
-- **Price history tracking** for audit compliance
-- **Immutable sale records** for financial accuracy
+## Architectural Highlights
 
-### 📊 **Advanced Query Capabilities**
-- **Pagination** with configurable page sizes
-- **Dynamic sorting** by multiple fields
-- **Advanced filtering** and search functionality
-- **Query optimization** with proper indexing
-- **Performance monitoring** with Serilog
+  * Clean Architecture: A decoupled and layered design (Domain, Application, Infrastructure, Presentation) promotes high cohesion, low coupling, and a clear separation of concerns.
+  * Domain-Driven Design (DDD): Employs a rich domain model with encapsulated business logic, ensuring the core business rules are central to the application's design.
+  * Comprehensive Data Management: Implements full CRUD (Create, Read, Update, Delete) functionality for core e-commerce entities, including products, categories, and sales.
+  * Advanced Query Capabilities: Supports robust pagination, multi-field sorting, and dynamic filtering to efficiently handle large and complex datasets.
+  * Data Integrity and Auditing: Utilizes soft deletes for data preservation and tracks price history for full audit compliance. Sales records are designed to be immutable once finalized to ensure financial accuracy.
+  * Extensive Test Coverage: Includes a comprehensive suite of unit and integration tests to verify code reliability, correctness, and behavior.
+  * API Documentation: Automatically generates OpenAPI (Swagger) documentation for clear, interactive API exploration and client generation.
 
-### 🧪 **Comprehensive Testing**
-- **Unit tests** with 95%+ code coverage
-- **Integration tests** for API endpoints
-- **Service layer testing** with mocking
-- **Database testing** with in-memory providers
-- **Automated test execution** in CI/CD
+## Technology Stack
 
-### 📚 **Professional Documentation**
-- **OpenAPI/Swagger** documentation
-- **XML documentation** for all public APIs
-- **Postman collection** for API testing
-- **Comprehensive README** with examples
-- **Architecture diagrams** and explanations
+| Component     | Technology               | Purpose |
+|-----------    |------------              |---------|
+| Framework     | ASP.NET Core 9           | Core web API and application framework |
+| Database      |  Entity Framework Core 9 | ORM for database access (SQLite & SQL Server providers) |
+| Logging       | Serilog                  | High-performance structured logging |
+| Validation    | FluentValidation         | Declarative and robust input validation |
+| Testing       | xUnit, FluentAssertions  | Unit and integration testing frameworks |
+| Documentation | Swagger/OpenAPI          | Interactive API documentation and specification |
 
-## 🛠️ Technology Stack
-
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Framework** | ASP.NET Core 9 | Web API framework |
-| **Database** | Entity Framework Core 9 | ORM with SQLite/SQL Server |
-| **Logging** | Serilog | Structured logging |
-| **Validation** | FluentValidation | Input validation |
-| **Mapping** | AutoMapper | Object mapping |
-| **Testing** | xUnit, FluentAssertions | Unit and integration testing |
-| **Documentation** | Swagger/OpenAPI | API documentation |
-
-## 🏛️ Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Presentation Layer                        │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
-│  │   Controllers   │  │   Middleware    │  │   Filters   │  │
-│  └─────────────────┘  └─────────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────┐
-│                     Application Layer                        │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
-│  │    Services     │  │      DTOs       │  │  Validation │  │
-│  └─────────────────┘  └─────────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────┐
-│                      Domain Layer                            │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
-│  │    Entities     │  │    Business     │  │    Enums    │  │
-│  │                 │  │     Logic       │  │             │  │
-│  └─────────────────┘  └─────────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-┌─────────────────────────────────────────────────────────────┐
-│                   Infrastructure Layer                       │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────┐  │
-│  │   DbContext     │  │    Extensions   │  │   Logging   │  │
-│  └─────────────────┘  └─────────────────┘  └─────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## 🚀 Quick Start
+## Getting Started
 
 ### Prerequisites
-- .NET 9 SDK
-- Visual Studio 2022 or VS Code
-- SQL Server (optional, SQLite included)
 
-### Installation
+  * .NET 9 SDK
+  * Visual Studio 2022 or another compatible IDE/editor
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/ecommerce-api.git
-   cd ecommerce-api
-   ```
+### Installation and Execution
 
-2. **Restore packages**
-   ```bash
-   dotnet restore
-   ```
+1.  **Clone the repository:**
 
-3. **Update connection string** (optional)
-   ```json
-   {
-     "ConnectionStrings": {
-       "DefaultConnection": "Data Source=Ecommerce.db"
-     }
-   }
-   ```
+    ```bash
+    git clone https://github.com/SheltonSB/ecommerce-api.git
+    cd ecommerce-api
+    ```
 
-4. **Run the application**
-   ```bash
-   dotnet run --project Ecommerce.Api
-   ```
+2.  **Restore NuGet packages:**
 
-5. **Access the API**
-   - **Swagger UI**: `https://localhost:7000`
-   - **Health Check**: `https://localhost:7000/health`
+    ```bash
+    dotnet restore
+    ```
 
-## 📖 API Documentation
+3.  **Run the application:**
 
-### Core Endpoints
+    ```bash
+    dotnet run --project Ecommerce.Api
+    ```
+
+4.  **Access the API Documentation:**
+    Navigate to `https://localhost:7000` in a web browser. The application is configured to use an in-memory or SQLite database by default for ease of setup and testing.
+
+## API Endpoints Overview
+
+The API exposes a set of RESTful endpoints for managing e-commerce resources. The following is a summary of the primary endpoints.
 
 #### Categories
-```
-GET    /api/categories          - Get paginated categories
-GET    /api/categories/{id}     - Get category by ID
-POST   /api/categories          - Create new category
-PUT    /api/categories/{id}     - Update category
-DELETE /api/categories/{id}     - Soft delete category
-```
+
+  * `GET /api/categories` - Retrieve a paginated list of categories.
+  * `POST /api/categories` - Create a new category.
+  * `PUT /api/categories/{id}` - Update an existing category.
 
 #### Products
-```
-GET    /api/products            - Get paginated products
-GET    /api/products/{id}       - Get product by ID
-GET    /api/products/sku/{sku}  - Get product by SKU
-POST   /api/products            - Create new product
-PUT    /api/products/{id}       - Update product
-PATCH  /api/products/{id}/stock - Update product stock
-DELETE /api/products/{id}       - Soft delete product
-```
+
+  * `GET /api/products` - Retrieve a paginated list of products with filtering and sorting.
+  * `GET /api/products/{id}` - Retrieve a single product by its ID.
+  * `POST /api/products` - Create a new product.
 
 #### Sales
-```
-GET    /api/sales               - Get paginated sales
-GET    /api/sales/{id}          - Get sale by ID
-POST   /api/sales               - Create new sale
-PUT    /api/sales/{id}          - Update sale
-POST   /api/sales/{id}/complete - Complete sale
-POST   /api/sales/{id}/cancel   - Cancel sale
-```
 
-### Advanced Features
+  * `GET /api/sales` - Retrieve a paginated list of sales records.
+  * `POST /api/sales` - Create a new sale record.
+  * `POST /api/sales/{id}/complete` - Mark a sale as complete.
 
-#### Pagination
-```http
-GET /api/products?page=1&pageSize=10&sortBy=name&sortDirection=asc
-```
+## Testing Strategy
 
-#### Filtering
-```http
-GET /api/products?categoryId=1&isActive=true&searchTerm=smartphone
-```
+The project maintains a high standard of quality through a multi-layered testing strategy. The test suite can be executed from the root directory with the following command:
 
-#### Price History
-```http
-GET /api/products/{id}/price-history
-```
-
-## 🧪 Testing
-
-### Run All Tests
 ```bash
 dotnet test
 ```
 
-### Run with Coverage
-```bash
-dotnet test --collect:"XPlat Code Coverage"
-```
+The strategy includes:
 
-### Test Categories
-- **Unit Tests**: Business logic and services
-- **Integration Tests**: API endpoints and database
-- **Performance Tests**: Load and stress testing
+  * Unit Tests: Validate individual components, services, and business logic in isolation.
+  * Integration Tests: Verify the interactions between different layers of the application, including API controllers and database persistence.
 
-## 📊 Sample Data
+## Contributing
 
-The application includes comprehensive seed data:
-- **6 Categories**: Electronics, Clothing, Books, Home & Garden, Sports, Beauty
-- **16 Products**: Across all categories with realistic pricing
-- **20 Sample Sales**: With various statuses and payment methods
-- **Price History**: Historical price changes for audit trails
+Contributions to the project are welcome. Please fork the repository, create a dedicated feature branch, and submit a pull request for review.
 
-## 🔧 Configuration
+## License
 
-### Environment Settings
-```json
-{
-  "ApiSettings": {
-    "DefaultPageSize": 10,
-    "MaxPageSize": 100,
-    "DefaultSortDirection": "asc"
-  },
-  "Serilog": {
-    "MinimumLevel": "Information"
-  }
-}
-```
-
-### Database Providers
-- **Development**: SQLite (file-based)
-- **Production**: SQL Server (configurable)
-
-## 🚀 Deployment
-
-### Docker Support
-```dockerfile
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
-COPY ["Ecommerce.Api/Ecommerce.Api.csproj", "Ecommerce.Api/"]
-RUN dotnet restore "Ecommerce.Api/Ecommerce.Api.csproj"
-COPY . .
-WORKDIR "/src/Ecommerce.Api"
-RUN dotnet build "Ecommerce.Api.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "Ecommerce.Api.csproj" -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Ecommerce.Api.dll"]
-```
-
-### Azure Deployment
-- **Azure App Service** ready
-- **Azure SQL Database** compatible
-- **Application Insights** integration ready
-
-## 📈 Performance Features
-
-### Query Optimization
-- **Eager Loading** for related entities
-- **Query filters** for soft deletes
-- **Indexed columns** for fast lookups
-- **Pagination** to limit result sets
-
-### Caching Strategy
-- **In-memory caching** for categories
-- **Response caching** for static data
-- **Distributed caching** ready for scaling
-
-### Monitoring
-- **Health checks** for system status
-- **Structured logging** with Serilog
-- **Performance counters** and metrics
-- **Error tracking** and alerting
-
-## 🔒 Security Features
-
-### Data Protection
-- **Soft deletes** for data preservation
-- **Audit trails** for all changes
-- **Input validation** and sanitization
-- **SQL injection** prevention
-
-### API Security
-- **HTTPS enforcement**
-- **CORS configuration**
-- **Rate limiting** ready
-- **Authentication** ready for integration
-
-## 📚 Learning Resources
-
-This project demonstrates:
-- **Clean Architecture** principles
-- **SOLID** design patterns
-- **Domain-Driven Design** concepts
-- **Test-Driven Development** practices
-- **Enterprise-grade** API development
-- **Production-ready** code quality
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add comprehensive tests
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🎯 Why This Project Stands Out
-
-### For Employers
-- **Production-ready** code quality
-- **Enterprise patterns** and practices
-- **Comprehensive testing** strategy
-- **Professional documentation**
-- **Scalable architecture** design
-
-### For Developers
-- **Learning opportunity** with best practices
-- **Real-world** implementation examples
-- **Clean, readable** code structure
-- **Modern technologies** and patterns
-- **Complete solution** from database to API
-
----
-
-**Built with ❤️ to demonstrate exceptional software engineering skills and stand out in the competitive tech market.**
-
-## 📞 Contact
-
-- **Email**: your.email@example.com
-- **LinkedIn**: [Your LinkedIn Profile]
-- **GitHub**: [Your GitHub Profile]
-
----
-
-*This project represents the pinnacle of modern API development, showcasing the skills and knowledge required to build enterprise-grade software solutions.*
+This project is licensed under the MIT License. See the `LICENSE` file for full details.

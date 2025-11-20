@@ -957,19 +957,9 @@
             <response code="400">Invalid data provided</response>
             <response code="404">Sale not found</response>
         </member>
-        <member name="T:Ecommerce.Api.Data.AppDbContext">
+        <member name="T:Ecommerce.Api.Data.DesignTimeAppDbContextFactory">
             <summary>
-            Database context for the E-commerce application
-            </summary>
-        </member>
-        <member name="M:Ecommerce.Api.Data.AppDbContext.UpdateTimestamps">
-            <summary>
-            Updates timestamps for entities before saving
-            </summary>
-        </member>
-        <member name="M:Ecommerce.Api.Data.AppDbContext.SeedData(Microsoft.EntityFrameworkCore.ModelBuilder)">
-            <summary>
-            Seeds initial data for the application
+            Provides a lightweight design-time factory so EF tools do not need to run the web host.
             </summary>
         </member>
         <member name="T:Ecommerce.Api.Data.Seed">
@@ -1586,16 +1576,16 @@
             <param name="propertyPath">The property path (e.g., "Category.Name")</param>
             <returns>Property expression or null if not found</returns>
         </member>
-        <member name="T:Ecommerce.Api.Migrations.InitialCreate">
+        <member name="T:Ecommerce.Api.Migrations.InitialPostgres">
             <inheritdoc />
         </member>
-        <member name="M:Ecommerce.Api.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:Ecommerce.Api.Migrations.InitialPostgres.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:Ecommerce.Api.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+        <member name="M:Ecommerce.Api.Migrations.InitialPostgres.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
             <inheritdoc />
         </member>
-        <member name="M:Ecommerce.Api.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+        <member name="M:Ecommerce.Api.Migrations.InitialPostgres.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
         <member name="T:Ecommerce.Api.Services.CategoryService">

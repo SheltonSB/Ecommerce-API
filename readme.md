@@ -2,101 +2,100 @@
 
 -----
 
-# Enterprise E-commerce API
+# LuxeStore Commerce Platform
 
-A production-grade RESTful API for an e-commerce platform, built with ASP.NET Core 9. This project is designed following Clean Architecture and Domain-Driven Design (DDD) principles to ensure a scalable, maintainable, and thoroughly testable codebase. The solution demonstrates advanced software engineering practices suitable for enterprise-level applications, focusing on separation of concerns, data integrity, and robust performance.
+Modern e-commerce API + React frontend built with production practices: Identity + JWT auth with email verification, Neon Postgres, Stripe-ready plumbing, analytics tracking, and a minimalist Luxe UI.
 
-## Architectural Highlights
+## Highlights
+- ASP.NET Core 9 API with Identity (email confirmation), JWT auth, Serilog logging, EF Core (Npgsql), Stripe-ready services, and analytics (UserInteractions) for AI-ready data.
+- React + Vite + TypeScript + Tailwind frontend (LuxeStore design system) with Inter font, axios interceptors, hot toast notifications, and a curated home/products experience.
+- Migrations and seeding via EF Core; automated Swagger/OpenAPI; health checks; CORS policy for frontend origin.
 
-  * Clean Architecture: A decoupled and layered design (Domain, Application, Infrastructure, Presentation) promotes high cohesion, low coupling, and a clear separation of concerns.
-  * Domain-Driven Design (DDD): Employs a rich domain model with encapsulated business logic, ensuring the core business rules are central to the application's design.
-  * Comprehensive Data Management: Implements full CRUD (Create, Read, Update, Delete) functionality for core e-commerce entities, including products, categories, and sales.
-  * Advanced Query Capabilities: Supports robust pagination, multi-field sorting, and dynamic filtering to efficiently handle large and complex datasets.
-  * Data Integrity and Auditing: Utilizes soft deletes for data preservation and tracks price history for full audit compliance. Sales records are designed to be immutable once finalized to ensure financial accuracy.
-  * Extensive Test Coverage: Includes a comprehensive suite of unit and integration tests to verify code reliability, correctness, and behavior.
-  * API Documentation: Automatically generates OpenAPI (Swagger) documentation for clear, interactive API exploration and client generation.
+## Architecture
+- Domain: Entities (Products, Categories, Sales, PaymentInfo, PriceHistory, UserInteraction), ApplicationUser (Identity).
+- Data: EF Core (Npgsql) with migrations; design-time factory for tooling; soft deletes and audit fields.
+- Services: Products/Categories/Sales, EmailSender (SMTP-configurable), analytics tracker endpoints.
+- API: Controllers for auth (register/login/verify email), products, categories, sales, analytics; global exception middleware.
+- Frontend: Vite React TS, Tailwind, Lucide icons; pages for Home, Products, Login, Register, Verify Email; shared UI components.
 
-## Technology Stack
+## Prerequisites
+- .NET 9 SDK
+- Node 18+ (for frontend)
+- Postgres connection (Neon recommended)
+- SMTP creds (for real email) or leave EmailSender in no-op mode for local dev
 
-| Component     | Technology               | Purpose |
-|-----------    |------------              |---------|
-| Framework     | ASP.NET Core 9           | Core web API and application framework |
-| Database      |  Entity Framework Core 9 | ORM for database access (SQLite & SQL Server providers) |
-| Logging       | Serilog                  | High-performance structured logging |
-| Validation    | FluentValidation         | Declarative and robust input validation |
-| Testing       | xUnit, FluentAssertions  | Unit and integration testing frameworks |
-| Documentation | Swagger/OpenAPI          | Interactive API documentation and specification |
+## Configuration (API)
+Set via `appsettings.json` or environment variables:
+- `ConnectionStrings:DefaultConnection` (Neon/Postgres)
+- `Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience`
+- `Stripe:PublishableKey`, `Stripe:SecretKey` (placeholders OK until live)
+- `EmailSettings:Host`, `Port`, `From`, `UserName`, `Password`, `EnableSsl` (optional; if missing, registration still works and email send is skipped with a log warning)
+- `Frontend:BaseUrl` (used to build verify-email links; defaults to request host)
 
-## Getting Started
-
-### Prerequisites
-
-  * .NET 9 SDK
-  * Visual Studio 2022 or another compatible IDE/editor
-
-### Installation and Execution
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/SheltonSB/ecommerce-api.git
-    cd ecommerce-api
-    ```
-
-2.  **Restore NuGet packages:**
-
-    ```bash
-    dotnet restore
-    ```
-
-3.  **Run the application:**
-
-    ```bash
-    dotnet run --project Ecommerce.Api
-    ```
-
-4.  **Access the API Documentation:**
-    Navigate to `https://localhost:7000` in a web browser. The application is configured to use an in-memory or SQLite database by default for ease of setup and testing.
-
-## API Endpoints Overview
-
-The API exposes a set of RESTful endpoints for managing e-commerce resources. The following is a summary of the primary endpoints.
-
-#### Categories
-
-  * `GET /api/categories` - Retrieve a paginated list of categories.
-  * `POST /api/categories` - Create a new category.
-  * `PUT /api/categories/{id}` - Update an existing category.
-
-#### Products
-
-  * `GET /api/products` - Retrieve a paginated list of products with filtering and sorting.
-  * `GET /api/products/{id}` - Retrieve a single product by its ID.
-  * `POST /api/products` - Create a new product.
-
-#### Sales
-
-  * `GET /api/sales` - Retrieve a paginated list of sales records.
-  * `POST /api/sales` - Create a new sale record.
-  * `POST /api/sales/{id}/complete` - Mark a sale as complete.
-
-## Testing Strategy
-
-The project maintains a high standard of quality through a multi-layered testing strategy. The test suite can be executed from the root directory with the following command:
-
+## Run Locally
+API:
 ```bash
-dotnet test
+cd Ecommerce.Api
+dotnet run --launch-profile https   # listens on https://localhost:7154 and http://localhost:5154
 ```
 
-The strategy includes:
+Frontend:
+```bash
+cd frontend
+echo "VITE_API_BASE_URL=https://localhost:7154/api" > .env
+npm install
+npm run dev   # http://localhost:5173
+```
 
-  * Unit Tests: Validate individual components, services, and business logic in isolation.
-  * Integration Tests: Verify the interactions between different layers of the application, including API controllers and database persistence.
+## Database & Migrations
+Create/update schema on Neon:
+```bash
+cd Ecommerce.Api
+dotnet ef database update
+```
+To add a migration:
+```bash
+dotnet ef migrations add <Name>
+dotnet ef database update
+```
 
-## Contributing
+## Key Endpoints (public where noted)
+- Auth: `POST /api/auth/register` (sends verify link), `POST /api/auth/login` (blocks unconfirmed email), `POST /api/auth/verify-email`
+- Products (public): `GET /api/products`, `GET /api/products/{id}`, `GET /api/products/sku/{sku}`
+- Categories: `GET /api/categories`, `POST /api/categories`, `PUT /api/categories/{id}`
+- Sales: `GET /api/sales`, `POST /api/sales`, `POST /api/sales/{id}/complete`
+- Analytics: `POST /api/analytics/track`, `GET /api/analytics/export`
+- Health: `GET /health`
 
-Contributions to the project are welcome. Please fork the repository, create a dedicated feature branch, and submit a pull request for review.
+## Frontend Pages
+- `/home`: Luxe hero + highlights
+- `/products`: public catalog from API
+- `/register`: first/last/phone/email/password, prompts to verify email
+- `/login`: redirects to verify if email unconfirmed
+- `/verify-email`: handles token/userId from email link
 
-## License
+## Testing
+```bash
+dotnet test
+# Frontend lint not configured; add ESLint/Prettier as desired
+```
 
-This project is licensed under the MIT License. See the `LICENSE` file for full details.
+## Security Notes
+- Do not commit real secrets (DB, Stripe, JWT, SMTP). Use env vars in production.
+- CORS: allow your frontend origin (default http://localhost:5173 for dev).
+- HTTPS enforced in production; dev profile supports http/https.
+
+## Deployment Tips
+- API: Render Web Service with `dotnet publish -c Release -o out` and `dotnet Ecommerce.Api.dll`; set env vars and CORS origin.
+- DB: Neon Postgres with TLS (`Ssl Mode=Require;Trust Server Certificate=true` or as required).
+- Frontend: Vercel; set `VITE_API_BASE_URL` to your deployed API URL.
+
+## Rapid Verify Flow (no SMTP)
+- Register via `/api/auth/register` or the UI.
+- Capture `token` + `userId` from logs (or temporarily log them) and POST to `/api/auth/verify-email`, or open `/verify-email` page and paste values.
+
+## Build/Run Commands (Quick Reference)
+- Restore/build API: `dotnet restore && dotnet build`
+- Run API dev: `dotnet run --launch-profile https`
+- Frontend dev: `npm run dev` (in `frontend`)
+- Frontend build: `npm run build`

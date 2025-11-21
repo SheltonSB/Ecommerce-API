@@ -1,3 +1,4 @@
+using AutoMapper;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
 using Ecommerce.Api.Services;
@@ -57,6 +58,8 @@ builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 
 // Register Services
 builder.Services.AddScoped<IProductService, ProductService>();

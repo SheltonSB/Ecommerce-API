@@ -1,5 +1,6 @@
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
@@ -10,6 +11,7 @@ namespace Ecommerce.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[AllowAnonymous]
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
@@ -52,6 +54,7 @@ public class ProductsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> GetById(int id)
     {
         var result = await _productService.GetByIdAsync(id);
@@ -72,6 +75,7 @@ public class ProductsController : ControllerBase
     [HttpGet("sku/{sku}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> GetBySku(string sku)
     {
         var result = await _productService.GetBySkuAsync(sku);
@@ -90,6 +94,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns low stock products</response>
     [HttpGet("low-stock")]
     [ProducesResponseType(typeof(IEnumerable<ProductListItemDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProductListItemDto>>> GetLowStock([FromQuery] int threshold = 10)
     {
         var result = await _productService.GetLowStockProductsAsync(threshold);
@@ -104,6 +109,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns products in the category</response>
     [HttpGet("category/{categoryId}")]
     [ProducesResponseType(typeof(IEnumerable<ProductListItemDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProductListItemDto>>> GetByCategory(int categoryId)
     {
         var result = await _productService.GetByCategoryAsync(categoryId);
@@ -118,6 +124,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns price history</response>
     [HttpGet("{id}/price-history")]
     [ProducesResponseType(typeof(IEnumerable<PriceHistoryDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory(int id)
     {
         var result = await _productService.GetPriceHistoryAsync(id);
@@ -233,4 +240,3 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 }
-

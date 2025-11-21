@@ -14,6 +14,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<SaleItem> SaleItems { get; set; }
     public DbSet<PriceHistory> PriceHistories { get; set; }
     public DbSet<PaymentInfo> PaymentInfos { get; set; }
+    public DbSet<UserInteraction> UserInteractions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

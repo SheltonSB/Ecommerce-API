@@ -1588,6 +1588,18 @@
         <member name="M:Ecommerce.Api.Migrations.InitialPostgres.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
             <inheritdoc />
         </member>
+        <member name="T:Ecommerce.Api.Migrations.AddAnalytics">
+            <inheritdoc />
+        </member>
+        <member name="M:Ecommerce.Api.Migrations.AddAnalytics.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ecommerce.Api.Migrations.AddAnalytics.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:Ecommerce.Api.Migrations.AddAnalytics.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
         <member name="T:Ecommerce.Api.Services.CategoryService">
             <summary>
             Service for category operations

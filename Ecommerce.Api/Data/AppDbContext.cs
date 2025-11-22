@@ -28,6 +28,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.Entity<Product>()
             .Property(p => p.Price)
             .HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Product>()
+            .Property(p => p.ImageUrl)
+            .HasMaxLength(500);
 
         modelBuilder.Entity<Sale>()
             .Property(s => s.TotalAmount)

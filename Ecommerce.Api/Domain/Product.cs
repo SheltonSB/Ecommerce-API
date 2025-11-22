@@ -43,6 +43,11 @@ public class Product : Entity
     public int StockQuantity { get; set; } = 0;
 
     /// <summary>
+    /// Public image URL hosted in Cloudinary (or other CDN)
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
     /// Indicates if the product is active and available for sale
     /// </summary>
     public bool IsActive { get; set; } = true;

@@ -16,8 +16,13 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error?.response?.data?.message || 'Something went wrong';
-    toast.error(message);
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      (Array.isArray(error?.response?.data) ? error.response.data.join(', ') : null) ||
+      error?.message ||
+      'Something went wrong';
+    if (message) toast.error(message);
     return Promise.reject(error);
   }
 );

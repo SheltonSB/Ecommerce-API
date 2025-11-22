@@ -4,6 +4,7 @@ using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
 using Ecommerce.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Ecommerce.Api.Services;
 
@@ -15,18 +16,25 @@ public class ProductService : IProductService
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
     private readonly ILogger<ProductService> _logger;
+    private readonly ICacheProvider _cache;
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
 
-    public ProductService(AppDbContext context, IMapper mapper, ILogger<ProductService> logger)
+    public ProductService(AppDbContext context, IMapper mapper, ILogger<ProductService> logger, ICacheProvider cache)
     {
         _context = context;
         _mapper = mapper;
         _logger = logger;
+        _cache = cache;
     }
 
     /// <inheritdoc />
     public async Task<Paged<ProductListItemDto>> GetAllAsync(PagedRequest request, int? categoryId = null, string? searchTerm = null, bool? isActive = null)
     {
         request.Validate();
+
+        var cacheKey = $"products:{request.Page}:{request.PageSize}:{categoryId}:{searchTerm}:{isActive}:{request.SortBy}:{request.SortDirection}";
+        var cached = await _cache.GetAsync<Paged<ProductListItemDto>>(cacheKey);
+        if (cached != null) return cached;
 
         var query = _context.Products
             .Include(p => p.Category)
@@ -54,11 +62,14 @@ public class ProductService : IProductService
                 Sku = p.Sku,
                 StockQuantity = p.StockQuantity,
                 IsActive = p.IsActive,
-                CategoryName = p.Category.Name
+                CategoryName = p.Category.Name,
+                ImageUrl = p.ImageUrl
             })
             .ToListAsync();
 
-        return new Paged<ProductListItemDto>(items, request.Page, request.PageSize, totalItems);
+        var result = new Paged<ProductListItemDto>(items, request.Page, request.PageSize, totalItems);
+        await _cache.SetAsync(cacheKey, result, CacheDuration, trackKey: true);
+        return result;
     }
 
     /// <inheritdoc />
@@ -79,6 +90,7 @@ public class ProductService : IProductService
             Price = product.Price,
             Sku = product.Sku,
             StockQuantity = product.StockQuantity,
+            ImageUrl = product.ImageUrl,
             IsActive = product.IsActive,
             Category = new CategoryListItemDto
             {
@@ -134,6 +146,7 @@ public class ProductService : IProductService
 
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Created product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -171,6 +184,7 @@ public class ProductService : IProductService
         product.UpdateTimestamp();
 
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Updated product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -188,6 +202,7 @@ public class ProductService : IProductService
 
         product.UpdateStock(dto.StockQuantity);
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Updated stock for product {ProductName} (ID: {ProductId}) to {StockQuantity}", product.Name, product.Id, dto.StockQuantity);
 
@@ -213,6 +228,7 @@ public class ProductService : IProductService
 
         product.MarkAsDeleted();
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Soft deleted product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -231,6 +247,7 @@ public class ProductService : IProductService
 
         product.Restore();
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Restored product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -266,6 +283,11 @@ public class ProductService : IProductService
         }
 
         return await query.AnyAsync();
+    }
+
+    private Task InvalidateProductCache()
+    {
+        return _cache.RemoveByPrefixAsync("products:");
     }
 
     /// <inheritdoc />

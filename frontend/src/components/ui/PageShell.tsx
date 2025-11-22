@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { NavLink } from 'react-router-dom';
-import { cn } from '../../utils/cn';
-import { ShoppingBag, LogIn, UserPlus, Home } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { ShoppingBag, LogIn, UserPlus, Home, Settings } from 'lucide-react';
 
 export function PageShell({ children }: PropsWithChildren<{}>) {
   return (
@@ -25,6 +25,9 @@ export function PageShell({ children }: PropsWithChildren<{}>) {
                 Home
               </div>
             </NavLink>
+            <NavLink className={({ isActive }) => navClasses(isActive)} to="/store">
+              Store
+            </NavLink>
             <NavLink className={({ isActive }) => navClasses(isActive)} to="/products">
               Products
             </NavLink>
@@ -40,6 +43,12 @@ export function PageShell({ children }: PropsWithChildren<{}>) {
                 Register
               </div>
             </NavLink>
+            <NavLink className={({ isActive }) => navClasses(isActive)} to="/admin/products/new">
+              <div className="flex items-center gap-1">
+                <Settings className="h-4 w-4" />
+                Admin
+              </div>
+            </NavLink>
           </nav>
         </div>
       </header>
@@ -50,7 +59,7 @@ export function PageShell({ children }: PropsWithChildren<{}>) {
 
 function navClasses(isActive: boolean) {
   return cn(
-    'rounded-md px-3 py-2 transition-colors hover:bg-gray-100',
+    'rounded-md px-3 py-2 transition-colors hover:bg-accent/40',
     isActive ? 'text-indigo-700 bg-indigo-50' : 'text-gray-600'
   );
 }

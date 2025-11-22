@@ -144,6 +144,11 @@ public class ProductDto
     public int StockQuantity { get; set; }
 
     /// <summary>
+    /// Public image URL for the product
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
     /// Indicates if the product is active
     /// </summary>
     public bool IsActive { get; set; }
@@ -193,6 +198,11 @@ public class ProductListItemDto
     /// Stock quantity available
     /// </summary>
     public int StockQuantity { get; set; }
+
+    /// <summary>
+    /// Public image URL for the product
+    /// </summary>
+    public string? ImageUrl { get; set; }
 
     /// <summary>
     /// Indicates if the product is active

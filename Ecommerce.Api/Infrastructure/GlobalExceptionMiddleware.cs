@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace Ecommerce.Api.Infrastructure;
 
@@ -35,6 +36,7 @@ public class GlobalExceptionMiddleware
         context.Response.ContentType = "application/json";
 
         var response = new ErrorResponse();
+        response.TraceId = Activity.Current?.Id ?? context.TraceIdentifier;
 
         switch (exception)
         {

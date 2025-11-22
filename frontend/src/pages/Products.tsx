@@ -4,6 +4,7 @@ import api from '../api/axios';
 import { Button } from '../components/ui/Button';
 import { ShoppingCart } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { mockProducts } from '../data/mockProducts';
 
 type Product = {
   id: number;
@@ -11,6 +12,7 @@ type Product = {
   description?: string;
   price: number;
   sku: string;
+  imageUrl?: string;
 };
 
 type PagedResponse<T> = {
@@ -21,14 +23,21 @@ type PagedResponse<T> = {
 export function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await api.get<PagedResponse<Product>>('/products');
-        setProducts(res.data.items ?? res.data);
-      } catch (err) {
-        // handled by interceptor
+        const incoming = (res.data as any)?.items ?? (res.data as any) ?? [];
+        if (Array.isArray(incoming) && incoming.length > 0) {
+          setProducts(incoming);
+        } else {
+          setProducts(mockProducts);
+        }
+      } catch (err: any) {
+        setError('Failed to load products');
+        setProducts(mockProducts);
       } finally {
         setLoading(false);
       }
@@ -42,7 +51,20 @@ export function Products() {
   };
 
   if (loading) {
-    return <p className="text-sm text-gray-500">Loading products...</p>;
+    return (
+      <div className="space-y-3">
+        <div className="h-6 w-48 animate-pulse rounded bg-muted"></div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <div key={idx} className="h-48 animate-pulse rounded-xl bg-muted" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p className="text-sm text-red-500">{error}</p>;
   }
 
   return (
@@ -59,7 +81,16 @@ export function Products() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
-          <Card key={product.id} className="flex flex-col gap-3">
+          <Card key={product.id} className="flex flex-col gap-3 overflow-hidden">
+            {product.imageUrl ? (
+              <div className="relative h-36 w-full overflow-hidden rounded-lg bg-gray-100">
+                <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+              </div>
+            ) : (
+              <div className="flex h-36 w-full items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-400">
+                No image
+              </div>
+            )}
             <div>
               <p className="text-base font-semibold text-gray-900">{product.name}</p>
               <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>

@@ -54,8 +54,13 @@ public class CheckoutController : ControllerBase
             Mode = "payment",
             SuccessUrl = "http://localhost:5173/success",
             CancelUrl = "http://localhost:5173/cart",
-            Metadata = new Dictionary<string, string> { { "UserId", userId } }
+            Metadata = new Dictionary<string, string>()
         };
+
+        if (userId != null)
+        {
+            options.Metadata.Add("UserId", userId);
+        }
 
         var service = new SessionService();
         Session session = await service.CreateAsync(options);

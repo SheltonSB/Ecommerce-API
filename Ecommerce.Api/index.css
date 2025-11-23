@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+     :root {
+        --background: 35 20% 97%;
+        --primary: 25 25% 20%;
+        --accent: 30 40% 55%;
+        --border: 35 15% 88%;
+    }
+    .dark {
+        /* Define dark mode colors here if needed later */
+    }
+}

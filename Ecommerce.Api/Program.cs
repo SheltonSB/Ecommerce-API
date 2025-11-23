@@ -20,8 +20,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Database (Neon Postgres)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseInMemoryDatabase("EcommerceTests"));
+}
+else
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(connectionString));
+}
 
 // 2. Auth (Identity)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

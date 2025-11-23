@@ -1,68 +1,47 @@
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# General
+.DS_Store
+.vscode/
 
-# Visual Studio cache/options directory
-.vs/
+# Rider / Resharper
+.idea/
+*.sln.DotSettings.user
 
 # User-specific files
-*.rsuser
-*.suo
 *.user
-*.userosscache
-*.sln.docstates
+*.suo
 
-# .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
+## ---------------------
+## .NET / C#
+## ---------------------
+# Folders
+[Bb]in/
+[Oo]bj/
 
-# Node
+# Build results
+[Dd]ebug/
+[Rr]elease/
+
+# Secrets
+# This will ignore appsettings files for specific environments,
+# preventing local database connection strings from being committed.
+appsettings.*.json
+!appsettings.json
+
+# User Secrets
+**/secrets.json
+
+## ---------------------
+## Node.js / Frontend
+## ---------------------
+# Folders
 node_modules/
 dist/
-dist-ssr/
-*.local
-coverage/
-**/coverage/
-
-# Sensitive configuration files
-**/appsettings.Development.json
-**/appsettings.Production.json
-**/*secrets*.json
-
-# Database files
-*.db
-*.db-shm
-*.db-wal
+.vite/
 
 # Logs
-logs/
-*.log
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+npm-debug.log*
 
 # Environment variables
-.env
-.env.local
-.env.*.local
+# This ensures your VITE_API_URL and other potential secrets are never committed.
+.env*
+!.env.example

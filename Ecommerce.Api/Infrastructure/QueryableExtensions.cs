@@ -105,6 +105,7 @@ public static class QueryableExtensions
     /// </summary>
     /// <typeparam name="T">The type of items in the collection</typeparam>
     /// <param name="query">The queryable collection</param>
+    /// <param name="condition">The condition to evaluate</param>
     /// <param name="predicate">Filter condition</param>
     /// <returns>Filtered queryable</returns>
     public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
@@ -119,7 +120,8 @@ public static class QueryableExtensions
     /// <param name="query">The queryable collection</param>
     /// <param name="condition">Condition to check</param>
     /// <param name="predicate">Filter condition</param>
-    /// <returns>Filtered queryable</returns>
+    /// <param name="elsePredicate">Filter condition to apply if the primary condition is false</param>
+    /// <returns>Filtered queryable</returns>    
     public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate, Expression<Func<T, bool>> elsePredicate)
     {
         return condition ? query.Where(predicate) : query.Where(elsePredicate);

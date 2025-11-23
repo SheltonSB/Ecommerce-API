@@ -1,10 +1,9 @@
-using Ecommerce.Api;
 using Ecommerce.Api.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Linq;
 
 namespace Ecommerce.Tests;
 
@@ -12,27 +11,31 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureServices(services =>
         {
-            // Remove existing DbContextOptions/AppDbContext registrations (Postgres)
-            services.RemoveAll(typeof(DbContextOptions<AppDbContext>));
-            services.RemoveAll(typeof(AppDbContext));
-
-            // Remove any Npgsql provider registrations to avoid dual-provider conflicts
-            var npgsqlDescriptors = services
-                .Where(d =>
-                    d.ImplementationType?.Namespace?.Contains("Npgsql.EntityFrameworkCore.PostgreSQL") == true ||
-                    d.ServiceType.Namespace?.Contains("Npgsql.EntityFrameworkCore.PostgreSQL") == true)
-                .ToList();
-            foreach (var d in npgsqlDescriptors)
+            // remove existing AppDbContext registrations (Postgres)
+            var dbContextDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
+            if (dbContextDescriptor != null)
             {
-                services.Remove(d);
+                services.Remove(dbContextDescriptor);
+            }
+            // remove any additional registrations that might hold onto Npgsql provider
+            var toRemove = services
+                .Where(d =>
+                    d.ServiceType.FullName?.Contains("Npgsql") == true ||
+                    d.ImplementationType?.FullName?.Contains("Npgsql") == true)
+                .ToList();
+            foreach (var descriptor in toRemove)
+            {
+                services.Remove(descriptor);
             }
 
+            // Add a new in-memory database context for testing
             services.AddDbContext<AppDbContext>(options =>
-            {
-                options.UseInMemoryDatabase($"EcommerceTests-{Guid.NewGuid()}");
-            });
+                options.UseInMemoryDatabase("InMemoryDbForTesting"));
         });
     }
 }

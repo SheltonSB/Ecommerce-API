@@ -1,107 +1,138 @@
-using Ecommerce.Api.Contracts;
-using Ecommerce.Api.Domain;
-using Ecommerce.Api.Services;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Ecommerce.Api.Contracts;
+using Ecommerce.Api.Domain;
+using Ecommerce.Api.Services;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Ecommerce.Api.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
-[EnableRateLimiting("authLimiter")]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
-    private readonly IEmailSender _emailSender;
+    private readonly IEmailService _emailService;
 
-    public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration, IEmailSender emailSender)
+    public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration, IEmailService emailService)
     {
         _userManager = userManager;
         _configuration = configuration;
-        _emailSender = emailSender;
+        _emailService = emailService;
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterDto model)
+    public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
-
-        var fullName = $"{model.FirstName} {model.LastName}".Trim();
-        var user = new ApplicationUser
-        {
-            UserName = model.Email,
-            Email = model.Email,
-            FullName = fullName,
-            PhoneNumber = model.PhoneNumber
-        };
+        var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
         var result = await _userManager.CreateAsync(user, model.Password);
-        if (!result.Succeeded) return BadRequest(result.Errors);
 
+        if (!result.Succeeded)
+        {
+            return BadRequest(result.Errors);
+        }
+
+        // Generate email confirmation token
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var baseUrl = _configuration["Frontend:BaseUrl"];
-        var callbackBase = !string.IsNullOrWhiteSpace(baseUrl)
-            ? baseUrl.TrimEnd('/')
-            : $"{Request.Scheme}://{Request.Host}";
-        var confirmationLink =
-            $"{callbackBase}/verify-email?userId={Uri.EscapeDataString(user.Id)}&token={Uri.EscapeDataString(token)}";
+        var confirmationLink = Url.Action(nameof(ConfirmEmail), "Auth", new { userId = user.Id, token }, Request.Scheme);
 
-        await _emailSender.SendEmailAsync(
-            user.Email!,
-            "Confirm your email",
-            $"<p>Please confirm your email by clicking the link below:</p><p><a href=\"{confirmationLink}\">Confirm Email</a></p>");
+        if (confirmationLink == null)
+        {
+            return StatusCode(500, "Could not generate confirmation link.");
+        }
 
-        return Ok(new { Message = "User registered successfully. Please check your email to confirm your account." });
+        // Send confirmation email
+        await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", $"Please confirm your account by clicking this link: {confirmationLink}");
+
+        return Ok(new { Message = "Registration successful. Please check your email to confirm your account." });
+    }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+        {
+            return BadRequest("Invalid user ID or token.");
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+
+        var result = await _userManager.ConfirmEmailAsync(user, token);
+        if (result.Succeeded)
+        {
+            return Ok(new { Message = "Email confirmed successfully. You can now log in." });
+        }
+
+        return BadRequest("Email could not be confirmed.");
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto model)
+    public async Task<IActionResult> Login([FromBody] LoginUserDto model)
     {
         var user = await _userManager.FindByEmailAsync(model.Email);
-        if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+
+        if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
         {
-            if (!user.EmailConfirmed)
-            {
-                return BadRequest(new { Message = "Email not verified. Please verify your email before logging in." });
-            }
-            var token = GenerateJwtToken(user);
-            return Ok(new AuthResponseDto(token, user.Email!, user.Id));
+            return Unauthorized("Invalid credentials.");
         }
-        return Unauthorized(new { Message = "Invalid login attempt" });
-    }
 
-    [HttpPost("verify-email")]
-    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto model)
-    {
-        var user = await _userManager.FindByIdAsync(model.UserId);
-        if (user == null) return BadRequest(new { Message = "Invalid user" });
+        // This check is now handled by Identity options (SignIn.RequireConfirmedAccount = true)
+        // but an explicit check provides a clearer error message.
+        if (!await _userManager.IsEmailConfirmedAsync(user))
+        {
+            return Unauthorized("Email not confirmed. Please check your inbox for the confirmation link.");
+        }
 
-        var result = await _userManager.ConfirmEmailAsync(user, model.Token);
-        if (result.Succeeded) return Ok(new { Message = "Email confirmed successfully" });
-
-        return BadRequest(result.Errors);
+        var token = GenerateJwtToken(user);
+        return Ok(new { Token = token });
     }
 
     private string GenerateJwtToken(ApplicationUser user)
     {
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
-        var tokenDescriptor = new SecurityTokenDescriptor
+        var claims = new List<Claim>
         {
-            Subject = new ClaimsIdentity(new[] {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email!)
-            }),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = _configuration["Jwt:Issuer"],
-            Audience = _configuration["Jwt:Audience"]
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email!),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-        var tokenHandler = new JwtSecurityTokenHandler();
-        return tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var expires = DateTime.Now.AddDays(Convert.ToDouble(_configuration["Jwt:ExpireDays"] ?? "7"));
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: expires,
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+}
+
+public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
+{
+    public RegisterUserDtoValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("A valid email is required.")
+            .SetAsyncValidator(new EmailDomainValidator<RegisterUserDto>())
+            .WithMessage("Email domain must be valid and able to receive emails.");
+
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage("Password is required.")
+            .MinimumLength(8).WithMessage("Password must be at least 8 characters long.");
     }
 }

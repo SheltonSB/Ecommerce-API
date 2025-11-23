@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Tests\\Ecommerce.Tests.csproj": {}
+    "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Tests/Ecommerce.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Api\\Ecommerce.Api.csproj": {
+    "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Api/Ecommerce.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Api\\Ecommerce.Api.csproj",
+        "projectUniqueName": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Api/Ecommerce.Api.csproj",
         "projectName": "Ecommerce.Api",
-        "projectPath": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Api\\Ecommerce.Api.csproj",
-        "packagesPath": "C:\\Users\\shelt\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Api\\obj\\",
+        "projectPath": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Api/Ecommerce.Api.csproj",
+        "packagesPath": "/Users/sheltonbumhe/.nuget/packages/",
+        "outputPath": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Api/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\shelt\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/sheltonbumhe/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -51,10 +44,6 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
-            "AspNetCore.HealthChecks.SqlServer": {
-              "target": "Package",
-              "version": "[8.0.2, )"
-            },
             "AutoMapper": {
               "target": "Package",
               "version": "[12.0.1, )"
@@ -63,9 +52,21 @@
               "target": "Package",
               "version": "[12.0.1, )"
             },
+            "CloudinaryDotNet": {
+              "target": "Package",
+              "version": "[1.27.8, )"
+            },
             "FluentValidation.AspNetCore": {
               "target": "Package",
               "version": "[11.3.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.10, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -77,31 +78,43 @@
               "target": "Package",
               "version": "[9.0.10, )"
             },
-            "Microsoft.EntityFrameworkCore.SqlServer": {
-              "target": "Package",
-              "version": "[9.0.10, )"
-            },
-            "Microsoft.EntityFrameworkCore.Sqlite": {
-              "target": "Package",
-              "version": "[9.0.10, )"
-            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
               "version": "[9.0.10, )"
             },
-            "Serilog.AspNetCore": {
+            "Microsoft.Extensions.Caching.StackExchangeRedis": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[9.0.0, )"
             },
-            "Serilog.Sinks.Console": {
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
-              "version": "[5.0.1, )"
+              "version": "[9.0.1, )"
             },
-            "Serilog.Sinks.File": {
+            "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
               "target": "Package",
-              "version": "[5.0.0, )"
+              "version": "[1.8.1, )"
+            },
+            "OpenTelemetry.Exporter.Prometheus.AspNetCore": {
+              "target": "Package",
+              "version": "[1.9.0-alpha.1, )"
+            },
+            "OpenTelemetry.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[1.8.1, )"
+            },
+            "OpenTelemetry.Instrumentation.AspNetCore": {
+              "target": "Package",
+              "version": "[1.8.1, )"
+            },
+            "OpenTelemetry.Instrumentation.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[1.10.0-beta.1, )"
+            },
+            "Stripe.net": {
+              "target": "Package",
+              "version": "[47.12.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -127,41 +140,34 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Tests\\Ecommerce.Tests.csproj": {
+    "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Tests/Ecommerce.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Tests\\Ecommerce.Tests.csproj",
+        "projectUniqueName": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Tests/Ecommerce.Tests.csproj",
         "projectName": "Ecommerce.Tests",
-        "projectPath": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Tests\\Ecommerce.Tests.csproj",
-        "packagesPath": "C:\\Users\\shelt\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Tests\\obj\\",
+        "projectPath": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Tests/Ecommerce.Tests.csproj",
+        "packagesPath": "/Users/sheltonbumhe/.nuget/packages/",
+        "outputPath": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Tests/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\shelt\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/sheltonbumhe/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Api\\Ecommerce.Api.csproj": {
-                "projectPath": "C:\\Users\\shelt\\OneDrive\\Desktop\\Ecommerce-API\\Ecommerce.Api\\Ecommerce.Api.csproj"
+              "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Api/Ecommerce.Api.csproj": {
+                "projectPath": "/Users/sheltonbumhe/Desktop/Ecommerce-API/Ecommerce.Api/Ecommerce.Api.csproj"
               }
             }
           }
@@ -185,6 +191,10 @@
             "FluentAssertions": {
               "target": "Package",
               "version": "[8.7.1, )"
+            },
+            "Microsoft.AspNetCore.Mvc.Testing": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             },
             "Microsoft.EntityFrameworkCore.InMemory": {
               "target": "Package",
@@ -225,7 +235,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

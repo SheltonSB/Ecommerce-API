@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Ecommerce.Api.Contracts;
+using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,7 +57,7 @@ public class AdminUploadTests : IClassFixture<CustomWebApplicationFactory>
         // create category to reference
         using (var scope = _factory.Services.CreateScope())
         {
-            var db = scope.ServiceProvider.GetRequiredService<Data.AppDbContext>();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Categories.Add(new Category { Name = "Cat", CreatedAt = DateTime.UtcNow });
             await db.SaveChangesAsync();
         }

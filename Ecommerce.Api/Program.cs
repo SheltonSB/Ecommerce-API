@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using System.Text;
 using System.Threading.RateLimiting;
 
@@ -97,7 +98,6 @@ builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics => metrics
         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Ecommerce.Api"))
         .AddAspNetCoreInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
         .AddPrometheusExporter())
     .WithTracing(tracing => tracing
         .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Ecommerce.Api"))
@@ -160,9 +160,19 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    // Support array or comma-separated env var (e.g., Cors__ProductionOrigins="https://a.com,https://b.com")
+    var prodOrigins = builder.Configuration.GetSection("Cors:ProductionOrigins").Get<string[]>() ?? Array.Empty<string>();
+    if (prodOrigins.Length == 0)
+    {
+        var csv = builder.Configuration["Cors:ProductionOrigins"];
+        prodOrigins = string.IsNullOrWhiteSpace(csv)
+            ? new[] { "https://your-production-domain.com" }
+            : csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
+
     app.UseHsts();
     app.UseCors(policy =>
-        policy.WithOrigins("https://your-production-domain.com")
+        policy.WithOrigins(prodOrigins)
               .AllowAnyMethod()
               .AllowAnyHeader());
 }
@@ -186,3 +196,6 @@ if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPa
 }
 
 app.Run();
+
+// Expose Program to integration tests
+public partial class Program { }

@@ -2,6 +2,7 @@ using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
+using Ecommerce.Api.Infrastructure;
 using Ecommerce.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -20,7 +21,8 @@ public class ProductServicePagingTests
 
         var config = new MapperConfiguration(cfg => cfg.AddMaps(typeof(Program)));
         var mapper = config.CreateMapper();
-        var cache = new MemoryCache(new MemoryCacheOptions());
+        var memoryCache = new MemoryCache(new MemoryCacheOptions());
+        var cache = new MemoryCacheProvider(memoryCache);
 
         await using var context = new AppDbContext(options);
 

@@ -16,6 +16,8 @@ public class MappingProfile : Profile
         CreateMap<CreateCategoryDto, Category>();
         CreateMap<UpdateCategoryDto, Category>();
 
+        CreateMap<Product, ProductDto>().ReverseMap();
+        CreateMap<Product, ProductListItemDto>();
         CreateMap<SaleItem, SaleItemDto>().ReverseMap();
         CreateMap<CreateSaleItemDto, SaleItem>();
 

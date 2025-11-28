@@ -4,6 +4,7 @@ using System.Text;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Domain;
 using Ecommerce.Api.Services;
+using Ecommerce.Api.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto model)
+    public async Task<IActionResult> Register([FromBody] RegisterDto model)
     {
         var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
         var result = await _userManager.CreateAsync(user, model.Password);
@@ -76,7 +77,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginUserDto model)
+    public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
         var user = await _userManager.FindByEmailAsync(model.Email);
 
@@ -121,14 +122,14 @@ public class AuthController : ControllerBase
     }
 }
 
-public class RegisterUserDtoValidator : AbstractValidator<RegisterUserDto>
+public class RegisterUserDtoValidator : AbstractValidator<RegisterDto>
 {
     public RegisterUserDtoValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("A valid email is required.")
-            .SetAsyncValidator(new EmailDomainValidator<RegisterUserDto>())
+            .SetAsyncValidator(new EmailDomainValidator<RegisterDto>())
             .WithMessage("Email domain must be valid and able to receive emails.");
 
         RuleFor(x => x.Password)

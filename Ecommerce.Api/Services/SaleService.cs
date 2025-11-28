@@ -1,4 +1,5 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -89,6 +90,12 @@ public class SaleService : ISaleService
                 throw new KeyNotFoundException($"Product with ID {itemDto.ProductId} not found.");
             }
 
+            if (product.StockQuantity < itemDto.Quantity)
+            {
+                throw new InvalidOperationException($"Out of stock: {product.Name}");
+            }
+
+            product.StockQuantity -= itemDto.Quantity;
             sale.AddSaleItem(product, itemDto.Quantity);
         }
 

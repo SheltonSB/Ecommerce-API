@@ -1,43 +1,34 @@
-using AutoMapper;
 using Ecommerce.Api.Data;
+using Ecommerce.Api.Middleware;
 using Ecommerce.Api.Domain;
-using Ecommerce.Api.Infrastructure;
 using Ecommerce.Api.Services;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Database (Neon Postgres)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (builder.Environment.IsEnvironment("Testing"))
-{
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseInMemoryDatabase("EcommerceTests"));
-}
-else
-{
-    builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(connectionString));
-}
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 // 2. Auth (Identity)
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Require a confirmed email to log in.
+    options.SignIn.RequireConfirmedAccount = true;
+})
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 // 3. JWT Configuration
-var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new Exception("JWT Key missing");
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key missing in configuration.");
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(options =>
@@ -47,7 +38,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
+    // In production, this should be true.
+    options.RequireHttpsMetadata = builder.Environment.IsDevelopment() ? false : true;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -63,147 +55,141 @@ builder.Services.AddAuthentication(options =>
 // 4. CORS (Allow Frontend)
 builder.Services.AddCors(options =>
 {
+    var frontendURL = builder.Configuration.GetValue<string>("FrontendURL") ?? "http://localhost:5173";
+
     options.AddPolicy("AllowReactApp", policy =>
-        policy.WithOrigins("http://localhost:5173")
-              .AllowAnyMethod()
-              .AllowAnyHeader());
+    {
+        policy.WithOrigins(frontendURL)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>(); // Register Validators
+
+// [CRITICAL FIX] Register AutoMapper so Services can use IMapper
 builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddScoped<IEmailSender, EmailSender>();
-builder.Services.AddScoped<ImageService>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "E-commerce API", Version = "v1" });
+
+    // Configure Swagger to use JWT authentication
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// Configure Cloudinary Settings
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
+
+// Register Application Services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
-builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IEmailService, DummyEmailService>(); // Register the email service
+builder.Services.AddScoped<IAnalyticsService, AnalyticsService>(); // Register the AI Analytics Service
+builder.Services.AddScoped<IPhotoService, PhotoService>();
 
-var redisConnection = builder.Configuration["Redis:ConnectionString"];
-if (string.IsNullOrWhiteSpace(redisConnection))
-{
-    redisConnection = builder.Configuration.GetConnectionString("Redis");
-}
-
-if (!string.IsNullOrWhiteSpace(redisConnection))
+// 5. Caching (Redis)
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+if (!string.IsNullOrEmpty(redisConnectionString) && builder.Environment.IsProduction())
 {
     builder.Services.AddStackExchangeRedisCache(options =>
     {
-        options.Configuration = redisConnection;
-        options.InstanceName = "Ecommerce_";
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "ecommerce_";
     });
-    builder.Services.AddScoped<ICacheProvider, DistributedCacheProvider>();
+    Console.WriteLine("[INFO] Using Redis for distributed caching.");
 }
 else
 {
     builder.Services.AddDistributedMemoryCache();
-    builder.Services.AddScoped<ICacheProvider, MemoryCacheProvider>();
+    Console.WriteLine("[INFO] Using in-memory cache. Set 'ConnectionStrings:Redis' for distributed caching in production.");
 }
 
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(metrics => metrics
-        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Ecommerce.Api"))
-        .AddAspNetCoreInstrumentation()
-        .AddPrometheusExporter())
-    .WithTracing(tracing => tracing
-        .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Ecommerce.Api"))
-        .AddAspNetCoreInstrumentation()
-        .AddEntityFrameworkCoreInstrumentation()
-        .AddOtlpExporter());
-builder.Services.AddRateLimiter(options =>
-{
-    options.AddPolicy("authLimiter", context =>
-        RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "anon", _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 20,
-            Window = TimeSpan.FromMinutes(1),
-            QueueLimit = 0,
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
-        }));
-
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-    {
-        var key = context.Connection.RemoteIpAddress?.ToString() ?? "anon";
-        return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 100,
-            Window = TimeSpan.FromMinutes(1),
-            QueueLimit = 0,
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
-        });
-    });
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-});
-builder.Services.AddRateLimiter(options =>
-{
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
-    {
-        var key = context.Connection.RemoteIpAddress?.ToString() ?? "anon";
-        return RateLimitPartition.GetFixedWindowLimiter(key, _ => new FixedWindowRateLimiterOptions
-        {
-            PermitLimit = 100,
-            Window = TimeSpan.FromMinutes(1),
-            QueueLimit = 0,
-            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
-        });
-    });
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-});
-
-// Register Services
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ISaleService, SaleService>();
-
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 // Configure Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors("AllowReactApp");
-}
-else
-{
-    // Support array or comma-separated env var (e.g., Cors__ProductionOrigins="https://a.com,https://b.com")
-    var prodOrigins = builder.Configuration.GetSection("Cors:ProductionOrigins").Get<string[]>() ?? Array.Empty<string>();
-    if (prodOrigins.Length == 0)
-    {
-        var csv = builder.Configuration["Cors:ProductionOrigins"];
-        prodOrigins = string.IsNullOrWhiteSpace(csv)
-            ? new[] { "https://your-production-domain.com" }
-            : csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-    }
-
-    app.UseHsts();
-    app.UseCors(policy =>
-        policy.WithOrigins(prodOrigins)
-              .AllowAnyMethod()
-              .AllowAnyHeader());
 }
 
 app.UseHttpsRedirection();
-app.UseRateLimiter();
+
+// CORS must run before Auth
+app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
-app.UseMiddleware<AuditMiddleware>();
 
-// Seed admin role/user if configured
-var adminEmail = builder.Configuration["AdminSeed:Email"];
-var adminPassword = builder.Configuration["AdminSeed:Password"];
-if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
+// Seed database with roles and admin user
+using (var scope = app.Services.CreateScope())
 {
-    await AdminSeeder.SeedAsync(app.Services, adminEmail, adminPassword);
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var dbContext = services.GetRequiredService<AppDbContext>();
+
+        // Create Admin role if it doesn't exist
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+            logger.LogInformation("'Admin' role created.");
+        }
+
+        // Create a default admin user if it doesn't exist
+        var adminEmail = "admin@ecommerce.com";
+        if (await userManager.FindByEmailAsync(adminEmail) == null)
+        {
+            var adminUser = new ApplicationUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+            var adminPassword = builder.Configuration["AdminUser:Password"] ?? throw new InvalidOperationException("Admin password not configured");
+            var result = await userManager.CreateAsync(adminUser, adminPassword);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(adminUser, "Admin");
+                logger.LogInformation("Default admin user created and assigned to 'Admin' role.");
+            }
+        }
+
+        // Seed database with sample product and sales data
+        await DataSeeder.SeedAsync(dbContext, logger);
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred during database seeding.");
+    }
 }
 
 app.Run();
 
-// Expose Program to integration tests
 public partial class Program { }

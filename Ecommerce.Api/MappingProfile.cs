@@ -12,7 +12,7 @@ public class MappingProfile : Profile
         CreateMap<Product, ProductListItemDto>()
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
         CreateMap<Product, ProductDto>()
-            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category));
 
         // Sale Mappings
         CreateMap<Sale, SaleListItemDto>()

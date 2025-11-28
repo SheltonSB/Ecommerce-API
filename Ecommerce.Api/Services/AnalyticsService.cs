@@ -110,9 +110,9 @@ public class AnalyticsService : IAnalyticsService
         if (revenuePrevious7Days > 0)
         {
             var weeklyChange = (totalRevenueLast7Days - revenuePrevious7Days) / revenuePrevious7Days;
-            if (weeklyChange > 0.05)
+            if (weeklyChange > 0.05m)
                 summaryBuilder.AppendLine($"- Sales are trending up, with a {weeklyChange:P1} increase in revenue this week compared to the previous week.");
-            else if (weeklyChange < -0.05)
+            else if (weeklyChange < -0.05m)
                 summaryBuilder.AppendLine($"- Sales are trending down, with a {Math.Abs(weeklyChange):P1} decrease in revenue this week compared to the previous week.");
             else
                 summaryBuilder.AppendLine("- Sales volume has remained stable over the last two weeks.");

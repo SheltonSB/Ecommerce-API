@@ -1,6 +1,8 @@
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ecommerce.Api.Controllers;
 
@@ -10,6 +12,7 @@ namespace Ecommerce.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize]
 public class SalesController : ControllerBase
 {
     private readonly ISaleService _saleService;
@@ -30,6 +33,7 @@ public class SalesController : ControllerBase
     /// <returns>Paginated list of sales</returns>
     /// <response code="200">Returns the paginated list of sales</response>
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(Paged<SaleListItemDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<Paged<SaleListItemDto>>> GetAll(
         [FromQuery] PagedRequest request,
@@ -57,6 +61,15 @@ public class SalesController : ControllerBase
         {
             return NotFound(new { message = $"Sale with ID {id} not found" });
         }
+
+        var isAdmin = User.IsInRole("Admin");
+        var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+        if (!isAdmin && (userEmail == null || !string.Equals(result.CustomerEmail, userEmail, StringComparison.OrdinalIgnoreCase)))
+        {
+            return Forbid();
+        }
+
         return Ok(result);
     }
 
@@ -68,6 +81,7 @@ public class SalesController : ControllerBase
     /// <returns>List of sales in the date range</returns>
     /// <response code="200">Returns sales in the date range</response>
     [HttpGet("date-range")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(IEnumerable<SaleListItemDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<SaleListItemDto>>> GetByDateRange(
         [FromQuery] DateTime startDate,
@@ -83,6 +97,7 @@ public class SalesController : ControllerBase
     /// <returns>Sales summary data</returns>
     /// <response code="200">Returns sales summary</response>
     [HttpGet("summary")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<object>> GetSummary()
     {
@@ -143,6 +158,7 @@ public class SalesController : ControllerBase
     /// <response code="204">Sale completed successfully</response>
     /// <response code="404">Sale not found</response>
     [HttpPost("{id}/complete")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Complete(int id)
@@ -163,6 +179,7 @@ public class SalesController : ControllerBase
     /// <response code="204">Sale cancelled successfully</response>
     /// <response code="404">Sale not found</response>
     [HttpPost("{id}/cancel")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Cancel(int id)
@@ -203,4 +220,3 @@ public class SalesController : ControllerBase
         return NoContent();
     }
 }
-

@@ -21,6 +21,8 @@ type PagedResponse<T> = {
   totalCount?: number;
 };
 
+const placeholderImage = 'https://placehold.co/600x400';
+
 const storeFeatures = [
   { title: 'Curated minimalism', copy: 'Calm, luxe layouts inspired by high-end editorial design.', icon: <Sparkles className="h-5 w-5 text-indigo-600" /> },
   { title: 'Secure checkout', copy: 'Identity + email verification with JWT auth for trust.', icon: <Shield className="h-5 w-5 text-indigo-600" /> },
@@ -134,13 +136,13 @@ export function Store() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {products.map((product) => (
               <Card key={product.id} className="flex flex-col gap-3 overflow-hidden">
-                {product.imageUrl ? (
-                  <div className="relative h-40 w-full overflow-hidden rounded-lg bg-gray-100">
-                    <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
-                  </div>
-                ) : (
-                  <div className="flex h-40 w-full items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-400">No image</div>
-                )}
+                <div className="relative h-40 w-full overflow-hidden rounded-lg bg-gray-100">
+                  <img
+                    src={product.imageUrl || placeholderImage}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                  />
+                </div>
                 <div>
                   <p className="text-base font-semibold text-gray-900">{product.name}</p>
                   <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>

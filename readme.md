@@ -11,6 +11,12 @@ Modern e-commerce API + React frontend built with production practices: Identity
 - React + Vite + TypeScript + Tailwind frontend (LuxeStore design system) with Inter font, axios interceptors, hot toast notifications, and a curated home/products experience.
 - Migrations and seeding via EF Core; automated Swagger/OpenAPI; health checks; CORS policy for frontend origin.
 
+## How to Run
+- Backend: `cd Ecommerce.Api && dotnet run` (uses CORS policy `AllowReactApp` for `http://localhost:5173` by default).
+- Frontend: `cd frontend && npm install && npm run dev` (create `.env` from `.env.example` and set `VITE_API_BASE_URL`).
+- Seeding: The API seeds sample data at startup via `DataSeeder.SeedAsync`; you can also POST `/api/DataSeeding/seed` from Swagger to repopulate quickly.
+- Test account: Admin user is created at startup as `admin@ecommerce.com` with password from `AdminUser:Password` in `appsettings.json` (set a strong value before running).
+
 ## Architecture
 - Domain: Entities (Products, Categories, Sales, PaymentInfo, PriceHistory, UserInteraction), ApplicationUser (Identity).
 - Data: EF Core (Npgsql) with migrations; design-time factory for tooling; soft deletes and audit fields.

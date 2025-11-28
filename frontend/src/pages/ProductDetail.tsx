@@ -15,6 +15,8 @@ type Product = {
   imageUrl?: string;
 };
 
+const placeholderImage = 'https://placehold.co/600x400';
+
 export function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -45,13 +47,7 @@ export function ProductDetail() {
   return (
     <div className="grid gap-10 lg:grid-cols-2">
       <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
-        {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="w-full rounded-2xl object-cover" />
-        ) : (
-          <div className="flex h-80 w-full items-center justify-center rounded-2xl bg-gray-100 text-sm text-gray-400">
-            No image
-          </div>
-        )}
+        <img src={product.imageUrl || placeholderImage} alt={product.name} className="w-full rounded-2xl object-cover" />
       </div>
       <div className="space-y-4">
         <p className="text-sm font-medium text-indigo-700">SKU {product.sku}</p>

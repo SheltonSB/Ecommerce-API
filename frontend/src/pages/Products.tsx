@@ -20,6 +20,8 @@ type PagedResponse<T> = {
   totalCount?: number;
 };
 
+const placeholderImage = 'https://placehold.co/600x400';
+
 export function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,15 +84,9 @@ export function Products() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
           <Card key={product.id} className="flex flex-col gap-3 overflow-hidden">
-            {product.imageUrl ? (
-              <div className="relative h-36 w-full overflow-hidden rounded-lg bg-gray-100">
-                <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
-              </div>
-            ) : (
-              <div className="flex h-36 w-full items-center justify-center rounded-lg bg-gray-100 text-sm text-gray-400">
-                No image
-              </div>
-            )}
+            <div className="relative h-36 w-full overflow-hidden rounded-lg bg-gray-100">
+              <img src={product.imageUrl || placeholderImage} alt={product.name} className="h-full w-full object-cover" />
+            </div>
             <div>
               <p className="text-base font-semibold text-gray-900">{product.name}</p>
               <p className="text-sm text-gray-500 line-clamp-2">{product.description}</p>

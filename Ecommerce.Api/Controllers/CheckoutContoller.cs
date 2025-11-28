@@ -52,8 +52,8 @@ public class CheckoutController : ControllerBase
         {
             LineItems = lineItems,
             Mode = "payment",
-            SuccessUrl = "http://localhost:5173/success",
-            CancelUrl = "http://localhost:5173/cart",
+            SuccessUrl = $"{_configuration["FrontendURL"]}/success",
+            CancelUrl = $"{_configuration["FrontendURL"]}/cart",
             Metadata = new Dictionary<string, string>()
         };
 

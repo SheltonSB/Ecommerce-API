@@ -1,9 +1,14 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5154/api'
-});
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5154/api';
+
+// In a production environment, if the API URL is not set, log a critical warning.
+if (import.meta.env.PROD && !import.meta.env.VITE_API_BASE_URL) {
+  console.warn('%cCRITICAL WARNING: VITE_API_BASE_URL is not set. The application will not connect to the backend.', 'color: red; font-weight: bold; font-size: 16px;');
+}
+
+const api = axios.create({ baseURL });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -12,7 +17,6 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
 api.interceptors.response.use(
   (response) => response,
   (error) => {

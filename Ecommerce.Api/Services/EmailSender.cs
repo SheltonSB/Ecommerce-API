@@ -58,14 +58,7 @@ public class EmailSender : IEmailSender
         };
         mailMessage.To.Add(toEmail);
 
-        try
-        {
-            await client.SendMailAsync(mailMessage);
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError(ex, "Failed to send email to {ToEmail}", toEmail);
-            // swallow in dev so registration/login flows don't break when email is unconfigured
-        }
+        // In production, we must not swallow email sending errors. Let the exception propagate.
+        await client.SendMailAsync(mailMessage);
     }
 }

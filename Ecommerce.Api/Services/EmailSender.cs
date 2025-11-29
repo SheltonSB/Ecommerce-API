@@ -7,7 +7,7 @@ namespace Ecommerce.Api.Services;
 /// <summary>
 /// Simple SMTP email sender. Configure via EmailSettings in appsettings or environment variables.
 /// </summary>
-public class EmailSender : IEmailSender
+public class EmailSender : IEmailSender, IEmailService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<EmailSender>? _logger;

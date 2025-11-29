@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { ShoppingCart, Shield, Sparkles, Truck, ArrowRight } from 'lucide-react';
+import { ShoppingCart, Shield, Sparkles, Truck, ArrowRight, Sparkle } from 'lucide-react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 import { mockProducts } from '../data/mockProducts';
@@ -56,16 +56,16 @@ export function Store() {
 
   return (
     <div className="space-y-12">
-      <section className="overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50 to-white shadow-sm">
-        <div className="grid gap-10 p-8 md:grid-cols-2 md:p-12">
-          <div className="flex flex-col justify-center space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-              <Sparkles className="h-4 w-4" />
-              LuxeStore
+      <section className="overflow-hidden rounded-3xl border border-white/60 bg-gradient-to-br from-[hsl(213,100%,97%)] via-white to-[hsl(230,60%,93%)] p-2 shadow-[0_20px_80px_-40px_rgba(15,23,42,0.5)]">
+        <div className="grid gap-10 rounded-2xl bg-white/65 p-8 backdrop-blur-xl md:grid-cols-2 md:p-12">
+          <div className="flex flex-col justify-center space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+              <Sparkle className="h-4 w-4" />
+              New season capsule
             </div>
-            <h1 className="text-4xl font-semibold text-gray-900 md:text-5xl leading-tight">Timeless Essentials.</h1>
-            <p className="text-lg text-gray-600">
-              A Havinic-inspired luxury storefront with curated goods, refined typography, and calm shopping flow.
+            <h1 className="text-4xl leading-tight text-slate-900 md:text-5xl">Modern staples, sapphire sheen.</h1>
+            <p className="text-lg text-slate-600">
+              Calm, editorial shopping with curated essentials, frictionless auth, and Stripe-ready checkout on a secure .NET backend.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button className="w-full sm:w-auto" onClick={() => (window.location.href = '#catalog')}>
@@ -77,22 +77,22 @@ export function Store() {
             </div>
           </div>
           <div className="relative">
-            <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-indigo-100 via-white to-indigo-50 blur-3xl" />
-            <div className="grid gap-4 rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-100">
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.18),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(6,182,212,0.18),transparent_35%)]" />
+            <div className="grid gap-4 rounded-2xl bg-white/85 p-6 shadow-xl backdrop-blur ring-1 ring-white/60">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-900">Featured set</p>
-                  <p className="text-xs text-gray-500">Curated drops from this season</p>
+                  <p className="text-sm font-medium text-slate-900">Featured set</p>
+                  <p className="text-xs text-slate-500">Curated drops from this season</p>
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600 text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-sky-500 text-white shadow-md shadow-blue-500/20">
                   <ShoppingCart className="h-5 w-5" />
                 </div>
               </div>
               <div className="space-y-3">
                 {mockProducts.slice(0, 3).map((p) => (
-                  <div key={p.id} className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                  <div key={p.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                     <span>{p.name}</span>
-                    <span className="font-semibold text-gray-900">${p.price.toFixed(2)}</span>
+                    <span className="font-semibold text-slate-900">${p.price.toFixed(2)}</span>
                   </div>
                 ))}
               </div>

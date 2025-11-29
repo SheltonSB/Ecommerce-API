@@ -62,7 +62,7 @@ public static class DataSeeder
             {
                 SaleNumber = $"SALE-{saleDate:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4).ToUpper()}",
                 SaleDate = saleDate,
-                Status = SaleStatus.Completed,
+                Status = SaleStatus.Pending,
                 CustomerName = $"Customer {i + 1}",
                 CustomerEmail = $"customer{i + 1}@example.com",
                 CustomerCity = city,
@@ -82,6 +82,9 @@ public static class DataSeeder
                     sale.AddSaleItem(product, quantity);
                 }
             }
+
+            // Mark seeded sales as completed after items are added.
+            sale.Status = SaleStatus.Completed;
 
             sales.Add(sale);
         }

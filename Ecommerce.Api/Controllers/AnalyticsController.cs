@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +39,7 @@ public class AnalyticsController : ControllerBase
     }
 
     [HttpGet("export")]
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ExportData()
     {
         var data = await _context.UserInteractions

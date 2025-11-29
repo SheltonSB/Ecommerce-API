@@ -1,6 +1,6 @@
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { ShoppingBag, Shield, Truck, Sparkles, Sparkle, Star } from 'lucide-react';
+import { ShoppingBag, Shield, Truck, Sparkles, Sparkle, Star, ArrowRight, BadgeCheck } from 'lucide-react';
 import { mockProducts } from '../data/mockProducts';
 import { cn } from '@/lib/utils';
 
@@ -26,49 +26,52 @@ const placeholderImage = 'https://placehold.co/600x400';
 export function Home() {
   return (
     <div className="space-y-14">
-      <section className="overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50 to-white shadow-sm">
-        <div className="grid gap-10 p-8 md:grid-cols-2 md:p-12">
-          <div className="flex flex-col justify-center space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+      <section className="overflow-hidden rounded-3xl border border-white/60 bg-gradient-to-br from-[hsl(213,100%,97%)] via-white to-[hsl(230,60%,93%)] p-2 shadow-[0_20px_80px_-40px_rgba(15,23,42,0.5)]">
+        <div className="grid gap-10 rounded-2xl bg-white/60 p-8 backdrop-blur-xl md:grid-cols-2 md:p-12">
+          <div className="flex flex-col justify-center space-y-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
               <Sparkle className="h-4 w-4" />
-              LuxeStore Experience
+              Calm, confident commerce
             </div>
-            <h1 className="text-4xl font-semibold text-gray-900 md:text-5xl leading-tight">Minimal commerce, elevated.</h1>
-            <p className="text-lg text-gray-600">
-              Havinic-inspired landing with curated products, refined typography, and a calm flow. Built on a secure API with email
-              verification and Stripe-ready checkout.
+            <h1 className="text-4xl leading-tight text-slate-900 md:text-5xl">Luxe storefronts with real momentum.</h1>
+            <p className="text-lg text-slate-600">
+              A sapphire-forward system with bold typography, curated product grid, and a secure ASP.NET Core backend—email verification,
+              JWT auth, Stripe-ready checkout, and admin uploads.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button className="w-full sm:w-auto" onClick={() => (window.location.href = '/products')}>
-                View catalog
+              <Button className="w-full sm:w-auto" onClick={() => (window.location.href = '/store')}>
+                Explore the store <ArrowRight className="h-4 w-4" />
               </Button>
               <Button variant="secondary" className="w-full sm:w-auto" onClick={() => (window.location.href = '/login')}>
-                Sign in
+                Sign in / Admin
               </Button>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Shield className="h-4 w-4 text-indigo-600" />
-              Email verification + JWT auth keep accounts secure
+            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+              <BadgeCheck className="h-4 w-4 text-blue-600" /> Email verification & JWT auth
+              <span className="h-1 w-1 rounded-full bg-slate-300" />
+              <Shield className="h-4 w-4 text-blue-600" /> Stripe-ready checkout
+              <span className="h-1 w-1 rounded-full bg-slate-300" />
+              <Truck className="h-4 w-4 text-blue-600" /> Admin image uploads
             </div>
           </div>
           <div className="relative">
-            <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-indigo-100 via-white to-indigo-50 blur-3xl" />
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.18),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(6,182,212,0.18),transparent_35%)]" />
             <div className="flex h-full items-center justify-center">
-              <div className="w-full max-w-md space-y-4 rounded-2xl bg-white p-6 shadow-lg ring-1 ring-gray-100">
+              <div className="glass-panel w-full max-w-md space-y-4 rounded-2xl p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 text-white shadow-md shadow-blue-500/20">
                     <ShoppingBag className="h-6 w-6" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Featured Drop</p>
-                    <p className="text-xs text-gray-500">Handpicked for a clean aesthetic</p>
+                    <p className="text-sm font-semibold text-slate-900">Featured Drop</p>
+                    <p className="text-xs text-slate-500">Handpicked minimal staples</p>
                   </div>
                 </div>
                 <div className="space-y-3">
                   {mockProducts.slice(0, 3).map((p) => (
-                    <div key={p.id} className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                    <div key={p.id} className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                       <span>{p.name}</span>
-                      <span className="font-semibold text-gray-900">${p.price.toFixed(2)}</span>
+                      <span className="font-semibold text-slate-900">${p.price.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>

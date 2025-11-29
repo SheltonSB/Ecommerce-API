@@ -2,14 +2,20 @@ using Ecommerce.Api.Data;
 using Ecommerce.Api.Middleware;
 using Ecommerce.Api.Domain;
 using Ecommerce.Api.Services;
+using Ecommerce.Api.Infrastructure;
+using Ecommerce.Api;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +23,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+// Validate critical secrets early (prod only)
+if (!builder.Environment.IsDevelopment())
+{
+    SecretsValidator.Validate(builder.Configuration);
+}
 
 // 2. Auth (Identity)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -117,9 +129,18 @@ builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection(
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
-builder.Services.AddScoped<IEmailService, DummyEmailService>(); // Register the email service
+// Use real email sender in non-development; fall back to dummy for local dev
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IEmailService, DummyEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, EmailSender>();
+}
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>(); // Register the AI Analytics Service
 builder.Services.AddScoped<IPhotoService, PhotoService>();
+builder.Services.AddScoped<ImageService>();
 
 // 5. Caching (Redis)
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
@@ -138,6 +159,34 @@ else
     Console.WriteLine("[INFO] Using in-memory cache. Set 'ConnectionStrings:Redis' for distributed caching in production.");
 }
 
+// Memory cache for in-process caching and ICacheProvider wiring
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<ICacheProvider>(sp =>
+{
+    // Prefer distributed cache when configured in production; otherwise fall back to in-memory cache.
+    if (!string.IsNullOrEmpty(redisConnectionString) && builder.Environment.IsProduction())
+    {
+        return new DistributedCacheProvider(sp.GetRequiredService<IDistributedCache>());
+    }
+
+    return new MemoryCacheProvider(sp.GetRequiredService<IMemoryCache>());
+});
+
+// Rate limiting for admin endpoints
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("authLimiter", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.User?.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 5,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+            }));
+});
+
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
@@ -150,6 +199,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 // CORS must run before Auth
 app.UseCors("AllowReactApp");

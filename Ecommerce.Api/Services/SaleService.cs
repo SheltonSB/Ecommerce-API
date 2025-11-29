@@ -95,7 +95,6 @@ public class SaleService : ISaleService
                 throw new InvalidOperationException($"Out of stock: {product.Name}");
             }
 
-            product.StockQuantity -= itemDto.Quantity;
             sale.AddSaleItem(product, itemDto.Quantity);
         }
 
@@ -136,6 +135,7 @@ public class SaleService : ISaleService
     {
         var sale = await _context.Sales
             .Include(s => s.SaleItems)
+                .ThenInclude(si => si.Product)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (sale == null)

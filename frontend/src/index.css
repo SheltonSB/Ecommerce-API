@@ -1,41 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Manrope:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 35 20% 97%;
-    --foreground: 25 10% 15%;
+    --background: 220 30% 98%;
+    --foreground: 222 25% 14%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 25 10% 15%;
+    --card: 0 0% 100% / 0.85;
+    --card-foreground: 222 25% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 25 10% 15%;
+    --popover-foreground: 222 25% 14%;
 
-    --primary: 25 25% 20%;
-    --primary-foreground: 35 20% 97%;
+    --primary: 225 77% 53%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 15% 92%;
-    --secondary-foreground: 25 10% 15%;
+    --secondary: 220 35% 96%;
+    --secondary-foreground: 222 25% 18%;
 
-    --muted: 35 15% 94%;
-    --muted-foreground: 25 8% 45%;
+    --muted: 220 25% 94%;
+    --muted-foreground: 222 12% 45%;
 
-    --accent: 30 40% 55%;
+    --accent: 199 95% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 35 15% 88%;
-    --input: 35 15% 88%;
-    --ring: 30 40% 55%;
+    --border: 220 25% 88%;
+    --input: 220 25% 88%;
+    --ring: 225 77% 53%;
 
-    --radius: 0.25rem;
+    --radius: 0.6rem;
 
-    --hero-gradient-start: 35 25% 95%;
-    --hero-gradient-end: 30 20% 92%;
+    --hero-gradient-start: 213 100% 97%;
+    --hero-gradient-end: 230 60% 93%;
   }
 
   .dark {
@@ -67,6 +69,7 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: 'Manrope', system-ui, -apple-system, sans-serif;
   }
   h1,
   h2,
@@ -74,9 +77,9 @@
   h4,
   h5,
   h6 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 500;
-    letter-spacing: -0.02em;
+    font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -86,5 +89,11 @@
   }
   .hero-gradient {
     background: linear-gradient(135deg, hsl(var(--hero-gradient-start)), hsl(var(--hero-gradient-end)));
+  }
+  .glass-panel {
+    background: hsla(0, 0%, 100%, 0.82);
+    box-shadow: 0 25px 80px rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(14px);
+    border: 1px solid hsla(var(--border), 0.6);
   }
 }

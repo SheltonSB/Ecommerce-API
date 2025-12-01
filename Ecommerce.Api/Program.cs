@@ -189,6 +189,22 @@ builder.Services.AddRateLimiter(options =>
 
 var app = builder.Build();
 
+// Apply migrations automatically on startup (container-friendly)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDbContext>();
+        await context.Database.MigrateAsync();
+        Console.WriteLine("✅ Database migrated successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Migration failed: {ex.Message}");
+    }
+}
+
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 // Configure Pipeline

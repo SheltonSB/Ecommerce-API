@@ -131,18 +131,67 @@ public class AnalyticsService : IAnalyticsService
 
     private SalesForecastDto GenerateSimpleForecast(List<Domain.Sale> salesLast30Days)
     {
+        // 1. Data Prep: We need at least 2 points to make a line.
         if (salesLast30Days.Count < 2)
         {
-            return new SalesForecastDto { PredictedRevenue = 0 };
+            return new SalesForecastDto
+            {
+                PredictedRevenue = 0,
+                Trend = "Insufficient Data"
+            };
         }
 
-        // Simple average daily revenue forecast
-        var averageDailyRevenue = salesLast30Days.Sum(s => s.FinalAmount) / 30;
-        var predictedRevenue = averageDailyRevenue * 7;
+        // 2. Group by Date (X axis = Days from start, Y axis = Total Sales)
+        // We map dates to integers (Day 0, Day 1... Day 29)
+        var startDate = DateTime.UtcNow.AddDays(-30).Date;
+
+        var points = salesLast30Days
+            .GroupBy(s => (s.SaleDate.Date - startDate).Days) // X: Days since start
+            .Select(g => new { X = (double)g.Key, Y = (double)g.Sum(s => s.FinalAmount) })
+            .OrderBy(p => p.X)
+            .ToList();
+
+        // 3. Calculate Sums for Least Squares Formula
+        double n = points.Count;
+        double sumX = points.Sum(p => p.X);
+        double sumY = points.Sum(p => p.Y);
+        double sumXY = points.Sum(p => p.X * p.Y);
+        double sumX2 = points.Sum(p => p.X * p.X);
+
+        // 4. Calculate Slope (m) and Intercept (b)
+        // Formula: m = (N*Σxy - Σx*Σy) / (N*Σx^2 - (Σx)^2)
+        double denominator = (n * sumX2) - (sumX * sumX);
+
+        // Edge case: Vertical line (variance is 0)
+        if (Math.Abs(denominator) < 0.0001)
+        {
+            var avg = (decimal)(sumY / n);
+            return new SalesForecastDto
+            {
+                PredictedRevenue = avg * 7,
+                Trend = "Flat"
+            };
+        }
+
+        double m = ((n * sumXY) - (sumX * sumY)) / denominator;
+        double b = (sumY - (m * sumX)) / n;
+
+        // 5. Predict Future Revenue (Next 7 Days)
+        // We predict Y for X=31, X=32, ..., X=37 and sum them up.
+        double predictedRevenue = 0;
+        for (int i = 1; i <= 7; i++)
+        {
+            double futureDay = 30 + i; // The next 7 days relative to start
+            double dailyPrediction = (m * futureDay) + b;
+
+            // Revenue can't be negative, even if the trend line crashes
+            predictedRevenue += Math.Max(0, dailyPrediction);
+        }
 
         return new SalesForecastDto
         {
-            PredictedRevenue = Math.Max(0, predictedRevenue) // Ensure non-negative forecast
+            PredictedRevenue = (decimal)predictedRevenue,
+            Trend = m > 0 ? "📈 Uptrend" : "📉 Downtrend"
         };
     }
 

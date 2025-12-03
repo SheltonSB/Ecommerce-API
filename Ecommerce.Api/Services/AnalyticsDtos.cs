@@ -60,6 +60,7 @@ public class GeospatialPerformanceDto
 public class SalesForecastDto
 {
     public decimal PredictedRevenue { get; set; }
+    public string Trend { get; set; } = string.Empty;
 }
 
 /// <summary>

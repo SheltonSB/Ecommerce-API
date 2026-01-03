@@ -83,25 +83,3 @@ dotnet ef database update
 ## Testing
 ```bash
 dotnet test
-# Frontend lint not configured; add ESLint/Prettier as desired
-```
-
-## Security Notes
-- Do not commit real secrets (DB, Stripe, JWT, SMTP). Use env vars in production.
-- CORS: allow your frontend origin (default http://localhost:5173 for dev).
-- HTTPS enforced in production; dev profile supports http/https.
-
-## Deployment Tips
-- API: Render Web Service with `dotnet publish -c Release -o out` and `dotnet Ecommerce.Api.dll`; set env vars and CORS origin.
-- DB: Neon Postgres with TLS (`Ssl Mode=Require;Trust Server Certificate=true` or as required).
-- Frontend: Vercel; set `VITE_API_BASE_URL` to your deployed API URL.
-
-## Rapid Verify Flow (no SMTP)
-- Register via `/api/auth/register` or the UI.
-- Capture `token` + `userId` from logs (or temporarily log them) and POST to `/api/auth/verify-email`, or open `/verify-email` page and paste values.
-
-## Build/Run Commands (Quick Reference)
-- Restore/build API: `dotnet restore && dotnet build`
-- Run API dev: `dotnet run --launch-profile https`
-- Frontend dev: `npm run dev` (in `frontend`)
-- Frontend build: `npm run build`

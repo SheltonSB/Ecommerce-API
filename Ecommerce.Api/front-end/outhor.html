@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Langster — Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --bg: #0b0f17;
+            --text: #eef2ff;
+            --muted: rgba(238, 242, 255, .72);
+            --muted2: rgba(238, 242, 255, .52);
+            --card: rgba(12, 16, 25, .55);
+            --stroke: rgba(255, 255, 255, .10);
+            --stroke2: rgba(255, 255, 255, .14);
+            --gold: #d6a94f;
+            --gold2: #f2c46f;
+            --shadow: 0 24px 60px rgba(0, 0, 0, .45);
+            --radius: 22px;
+            --max: 1180px;
+        }
+        
+        * {
+            box-sizing: border-box
+        }
+        
+        html,
+        body {
+            height: 100%
+        }
+        
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+        
+        button {
+            font: inherit
+        }
+        /* page shell */
+        
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        /* hero card */
+        
+        .hero {
+            width: min(var(--max), 100%);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            position: relative;
+            background: linear-gradient(90deg, rgba(6, 10, 18, .92) 0%, rgba(6, 10, 18, .72) 46%, rgba(6, 10, 18, .45) 100%), url("https://images.unsplash.com/photo-1521335629791-ce4aec67dd53?auto=format&fit=crop&w=2400&q=80");
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+        /* top nav */
+        
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px;
+            gap: 16px;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+        
+        .brand-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .10);
+            border: 1px solid rgba(255, 255, 255, .12);
+            backdrop-filter: blur(10px);
+        }
+        
+        .brand-name {
+            font-size: 18px
+        }
+        
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            padding: 10px 14px;
+            background: rgba(10, 14, 22, .35);
+            border: 1px solid rgba(255, 255, 255, .10);
+            border-radius: 999px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-center a {
+            font-size: 14px;
+            color: var(--muted);
+            padding: 6px 10px;
+            border-radius: 999px;
+            transition: .2s ease;
+        }
+        
+        .nav-center a:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, .06)
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(10, 14, 22, .35);
+            color: var(--text);
+            display: grid;
+            place-items: center;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: .2s ease;
+        }
+        
+        .icon-btn:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 255, 255, .20)
+        }
+        
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(10, 14, 22, .35);
+            backdrop-filter: blur(10px);
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        
+        .user-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 0 4px rgba(74, 222, 128, .16);
+        }
+        /* content */
+        
+        .content {
+            padding: 44px 22px 26px;
+        }
+        
+        .inner {
+            max-width: 760px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(10, 14, 22, .45);
+            border: 1px solid rgba(255, 255, 255, .12);
+            color: var(--muted);
+            font-size: 13px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 18px;
+        }
+        
+        .sparkle {
+            width: 22px;
+            height: 22px;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            background: rgba(214, 169, 79, .16);
+            border: 1px solid rgba(214, 169, 79, .28);
+            color: var(--gold2);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: clamp(38px, 5.3vw, 74px);
+            line-height: 1.02;
+            letter-spacing: -1.2px;
+            font-weight: 800;
+            text-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+        }
+        
+        .gold {
+            background: linear-gradient(90deg, var(--gold2), var(--gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .sub {
+            margin: 16px auto 0;
+            max-width: 640px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+        
+        .cta {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 26px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            height: 46px;
+            padding: 0 18px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: .2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            letter-spacing: .2px;
+            user-select: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--gold2), var(--gold));
+            color: #111827;
+            box-shadow: 0 12px 26px rgba(214, 169, 79, .22);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px)
+        }
+        
+        .btn-secondary {
+            background: rgba(10, 14, 22, .40);
+            border-color: rgba(255, 255, 255, .14);
+            color: var(--text);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 255, 255, .22)
+        }
+        
+        .arrow {
+            opacity: .9
+        }
+        
+        .play {
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, .22);
+            background: rgba(255, 255, 255, .06);
+        }
+        /* stats row */
+        
+        .stats {
+            margin-top: 42px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            padding: 18px 18px 22px;
+            border-top: 1px solid rgba(255, 255, 255, .10);
+            background: linear-gradient(180deg, rgba(10, 14, 22, .00), rgba(10, 14, 22, .25));
+        }
+        
+        .stat {
+            text-align: center;
+            padding: 8px 8px;
+        }
+        
+        .stat .num {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+        }
+        
+        .stat .label {
+            margin-top: 6px;
+            color: var(--muted2);
+            font-size: 13px;
+        }
+        /* mobile tweaks */
+        
+        .hamburger {
+            display: none
+        }
+        
+        @media (max-width: 860px) {
+            .nav-center {
+                display: none
+            }
+            .hamburger {
+                display: grid
+            }
+            .content {
+                padding-top: 34px
+            }
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 10px
+            }
+            .stat {
+                border: 1px solid rgba(255, 255, 255, .08);
+                border-radius: 16px;
+                background: rgba(10, 14, 22, .22)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <section class="hero" aria-label="Homepage hero">
+            <header class="nav">
+                <a class="brand" href="#">
+                    <span class="brand-badge">L</span>
+                    <span class="brand-name">Langster</span>
+                </a>
+
+                <nav class="nav-center" aria-label="Primary">
+                    <a href="#" aria-current="page">Home</a>
+                    <a href="#">Products</a>
+                </nav>
+
+                <div class="nav-right">
+                    <button class="icon-btn hamburger" aria-label="Open menu" title="Menu">
+            <!-- hamburger -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+                    <button class="icon-btn" aria-label="Search" title="Search">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M16.3 16.3 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+
+                    <button class="icon-btn" aria-label="Cart" title="Cart">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 7h15l-1.5 9H7.2L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M6 7 5 3H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" fill="currentColor"/>
+            </svg>
+          </button>
+
+                    <div class="user-chip" title="Signed in">
+                        <span class="user-dot" aria-hidden="true"></span>
+                        <span>Shelton Bumhe</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <div class="inner">
+                    <div class="badge">
+                        <span class="sparkle" aria-hidden="true">
+              <!-- sparkle icon -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2l1.2 5.2L18 9l-4.8 1.8L12 16l-1.2-5.2L6 9l4.8-1.8L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+              </svg>
+            </span>
+                        <span>Premium Collection 2024</span>
+                    </div>
+
+                    <h1>
+                        Discover<br/>
+                        <span class="gold">Elegance</span><br/> Redefined
+                    </h1>
+
+                    <p class="sub">
+                        Explore our curated collection of premium products, designed for those who appreciate the finer things in life.
+                    </p>
+
+                    <div class="cta">
+                        <a class="btn btn-primary" href="#">
+              Shop Collection
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+
+                        <button class="btn btn-secondary" type="button">
+              <span class="play" aria-hidden="true">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 7v10l9-5-9-5Z" fill="currentColor"/>
+                </svg>
+              </span>
+              Watch Story
+            </button>
+                    </div>
+                </div>
+
+                <div class="stats" role="list" aria-label="Key stats">
+                    <div class="stat" role="listitem">
+                        <div class="num">10K+</div>
+                        <div class="label">Happy Customers</div>
+                    </div>
+                    <div class="stat" role="listitem">
+                        <div class="num">500+</div>
+                        <div class="label">Products</div>
+                    </div>
+                    <div class="stat" role="listitem">
+                        <div class="num">99%</div>
+                        <div class="label">Satisfaction</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Code injected by live-server -->
+    <script>
+        // <![CDATA[  <-- For SVG support
+        if ('WebSocket' in window) {
+            (function() {
+                function refreshCSS() {
+                    var sheets = [].slice.call(document.getElementsByTagName("link"));
+                    var head = document.getElementsByTagName("head")[0];
+                    for (var i = 0; i < sheets.length; ++i) {
+                        var elem = sheets[i];
+                        var parent = elem.parentElement || head;
+                        parent.removeChild(elem);
+                        var rel = elem.rel;
+                        if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+                            var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+                            elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+                        }
+                        parent.appendChild(elem);
+                    }
+                }
+                var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+                var address = protocol + window.location.host + window.location.pathname + '/ws';
+                var socket = new WebSocket(address);
+                socket.onmessage = function(msg) {
+                    if (msg.data == 'reload') window.location.reload();
+                    else if (msg.data == 'refreshcss') refreshCSS();
+                };
+                if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+                    console.log('Live reload enabled.');
+                    sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+                }
+            })();
+        } else {
+            console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+        }
+        // ]]>
+    </script>
+</body>
+
+</html>

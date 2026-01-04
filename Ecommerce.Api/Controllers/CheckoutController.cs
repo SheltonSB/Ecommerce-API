@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stripe.Checkout;
 using System.Security.Claims;
+using Polly;
 
 namespace Ecommerce.Api.Controllers;
 
@@ -14,11 +15,13 @@ public class CheckoutController : ControllerBase
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IAsyncPolicy _resiliencePolicy;
 
-    public CheckoutController(AppDbContext context, IConfiguration configuration)
+    public CheckoutController(AppDbContext context, IConfiguration configuration, IAsyncPolicy resiliencePolicy)
     {
         _context = context;
         _configuration = configuration;
+        _resiliencePolicy = resiliencePolicy;
         Stripe.StripeConfiguration.ApiKey = _configuration["Stripe:SecretKey"];
     }
 
@@ -63,7 +66,7 @@ public class CheckoutController : ControllerBase
         }
 
         var service = new SessionService();
-        Session session = await service.CreateAsync(options);
+        Session session = await _resiliencePolicy.ExecuteAsync(() => service.CreateAsync(options));
         return Ok(new CheckoutResponseDto(session.Url));
     }
 }

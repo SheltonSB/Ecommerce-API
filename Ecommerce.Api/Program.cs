@@ -4,6 +4,7 @@ using Ecommerce.Api.Domain;
 using Ecommerce.Api.Services;
 using Ecommerce.Api.Infrastructure;
 using Ecommerce.Api;
+using Polly;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Caching.Distributed;
@@ -16,6 +17,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Threading.RateLimiting;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -142,6 +145,20 @@ builder.Services.AddScoped<IAnalyticsService, AnalyticsService>(); // Register t
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 builder.Services.AddScoped<ImageService>();
 
+// Resilience policies (retry + circuit breaker) for outbound calls (e.g., Stripe/Cloudinary)
+builder.Services.AddSingleton<IAsyncPolicy>(sp =>
+{
+    var retry = Policy
+        .Handle<Exception>()
+        .WaitAndRetryAsync(3, attempt => TimeSpan.FromMilliseconds(150 * attempt));
+
+    var circuit = Policy
+        .Handle<Exception>()
+        .CircuitBreakerAsync(2, TimeSpan.FromSeconds(20));
+
+    return Policy.WrapAsync(retry, circuit);
+});
+
 // 5. Caching (Redis)
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
 if (!string.IsNullOrEmpty(redisConnectionString) && builder.Environment.IsProduction())
@@ -185,6 +202,17 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 5,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst
             }));
+});
+
+// OpenTelemetry tracing
+builder.Services.AddOpenTelemetry().WithTracing(tracer =>
+{
+    tracer
+        .SetResourceBuilder(OpenTelemetry.Resources.ResourceBuilder.CreateDefault().AddService("Ecommerce.Api"))
+        .AddAspNetCoreInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter();
 });
 
 var app = builder.Build();

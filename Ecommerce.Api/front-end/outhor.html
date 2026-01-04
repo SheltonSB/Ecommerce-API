@@ -390,7 +390,7 @@
 
                     <div class="user-chip" title="Signed in">
                         <span class="user-dot" aria-hidden="true"></span>
-                        <span>Shelton Bumhe</span>
+                        <span id="user-name">Shelton Bumhe</span>
                     </div>
                 </div>
             </header>
@@ -435,21 +435,59 @@
 
                 <div class="stats" role="list" aria-label="Key stats">
                     <div class="stat" role="listitem">
-                        <div class="num">10K+</div>
+                        <div class="num" id="stat-customers">10K+</div>
                         <div class="label">Happy Customers</div>
                     </div>
                     <div class="stat" role="listitem">
-                        <div class="num">500+</div>
+                        <div class="num" id="stat-products">500+</div>
                         <div class="label">Products</div>
                     </div>
                     <div class="stat" role="listitem">
-                        <div class="num">99%</div>
+                        <div class="num" id="stat-satisfaction">99%</div>
                         <div class="label">Satisfaction</div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
+    <script>
+        /**
+         * Backend Integration Script
+         * This script fetches data from your API to populate the dashboard.
+         */
+        document.addEventListener('DOMContentLoaded', async() => {
+            // TODO: Replace with your actual backend URL
+            const API_BASE_URL = 'http://localhost:5000/api';
+
+            // Helper to fetch data safely
+            async function fetchData(endpoint) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`);
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    console.error(`Failed to fetch ${endpoint}:`, error);
+                    return null;
+                }
+            }
+
+            // 1. Load User Profile
+            // Expected JSON: { "name": "Shelton Bumhe" }
+            const user = await fetchData('/user/profile');
+            if (user && user.name) {
+                document.getElementById('user-name').textContent = user.name;
+            }
+
+            // 2. Load Statistics
+            // Expected JSON: { "customers": "10K+", "products": "500+", "satisfaction": "99%" }
+            const stats = await fetchData('/stats/overview');
+            if (stats) {
+                if (stats.customers) document.getElementById('stat-customers').textContent = stats.customers;
+                if (stats.products) document.getElementById('stat-products').textContent = stats.products;
+                if (stats.satisfaction) document.getElementById('stat-satisfaction').textContent = stats.satisfaction;
+            }
+        });
+    </script>
     <!-- Code injected by live-server -->
     <script>
         // <![CDATA[  <-- For SVG support

@@ -37,7 +37,7 @@ if (!builder.Environment.IsDevelopment())
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     // Require a confirmed email to log in.
-    options.SignIn.RequireConfirmedAccount = true;
+    options.SignIn.RequireConfirmedAccount = false;
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -236,14 +236,12 @@ using (var scope = app.Services.CreateScope())
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 // Configure Pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles(); // Serve the React files from wwwroot
 app.UseRateLimiter();
 
 // CORS must run before Auth
@@ -253,6 +251,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapFallbackToFile("index.html"); // Handle client-side routing
 
 // Seed database with roles and admin user
 using (var scope = app.Services.CreateScope())

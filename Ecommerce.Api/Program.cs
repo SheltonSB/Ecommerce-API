@@ -70,10 +70,15 @@ builder.Services.AddAuthentication(options =>
 // 4. CORS (Allow Frontend)
 builder.Services.AddCors(options =>
 {
-    var frontendURL = builder.Configuration.GetValue<string>("FrontendURL") ?? "http://localhost:5173";
+    var frontendURL = builder.Configuration.GetValue<string>("FrontendURL");
     var vercelUrl = builder.Configuration["VercelUrl"] ?? builder.Configuration["VERCEL_URL"];
 
-    var allowedOrigins = new List<string> { frontendURL.TrimEnd('/') };
+    var allowedOrigins = new List<string>();
+    if (!string.IsNullOrWhiteSpace(frontendURL))
+    {
+        allowedOrigins.Add(frontendURL.TrimEnd('/'));
+    }
+
     if (!string.IsNullOrWhiteSpace(vercelUrl))
     {
         var normalized = vercelUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase)
@@ -81,6 +86,8 @@ builder.Services.AddCors(options =>
             : $"https://{vercelUrl}";
         allowedOrigins.Add(normalized.TrimEnd('/'));
     }
+
+    Console.WriteLine($"[CORS] Configured Allowed Origins: {string.Join(", ", allowedOrigins)}");
 
     options.AddPolicy("AllowReactApp", policy =>
     {

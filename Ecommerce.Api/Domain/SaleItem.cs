@@ -44,11 +44,13 @@ public class SaleItem : Entity
     /// <summary>
     /// Navigation property for the sale
     /// </summary>
+    [ForeignKey("SaleId")]
     public virtual Sale Sale { get; set; } = null!;
 
     /// <summary>
     /// Navigation property for the product
     /// </summary>
+    [ForeignKey("ProductId")]
     public virtual Product Product { get; set; } = null!;
 
     /// <summary>

@@ -11,7 +11,6 @@ namespace Ecommerce.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-[AllowAnonymous]
 public class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;
@@ -34,6 +33,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns the paginated list of products</response>
     [HttpGet]
     [ProducesResponseType(typeof(Paged<ProductListItemDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<Paged<ProductListItemDto>>> GetAll(
         [FromQuery] PagedRequest request,
         [FromQuery] int? categoryId = null,

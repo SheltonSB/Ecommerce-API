@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './AuthContext';
 import { CartProvider, useCart } from './CartContext';
 import { track, pageView } from './analytics';
 import { API_URL } from './config';
+import AdminDashboard from './AdminDashboard';
 import './App.css';
 
 // --- Mock Data ---
@@ -612,6 +613,11 @@ export default function App() {
               <Route path="/checkout" element={
                 <RequireAuth>
                   <CheckoutPage />
+                </RequireAuth>
+              } />
+              <Route path="/admin" element={
+                <RequireAuth>
+                  <AdminDashboard />
                 </RequireAuth>
               } />
               <Route path="/login" element={<LoginPage />} />

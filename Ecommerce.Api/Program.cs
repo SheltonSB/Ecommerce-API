@@ -248,7 +248,17 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles(); // Serve the React files from wwwroot
+var spaIndex = app.Environment.WebRootFileProvider.GetFileInfo("index.html");
+var serveSpa = spaIndex.Exists;
+if (serveSpa)
+{
+    app.UseStaticFiles(); // Serve the React files from wwwroot
+}
+else
+{
+    app.Logger.LogInformation(
+        "No frontend build found in wwwroot. Static file hosting is disabled; build the UI to wwwroot or set FrontendURL to your hosted UI.");
+}
 app.UseRateLimiter();
 
 // CORS must run before Auth
@@ -259,7 +269,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapFallbackToFile("index.html"); // Handle client-side routing
+if (serveSpa)
+{
+    app.MapFallbackToFile("index.html"); // Handle client-side routing
+}
 
 // Seed database with roles and admin user
 using (var scope = app.Services.CreateScope())

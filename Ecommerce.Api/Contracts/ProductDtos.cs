@@ -35,15 +35,91 @@ public class CreateProductDto
     public string Sku { get; set; } = string.Empty;
 
     /// <summary>
+    /// UPC (Universal Product Code) - Global Barcode
+    /// </summary>
+    [StringLength(50, ErrorMessage = "UPC cannot exceed 50 characters")]
+    public string? Upc { get; set; }
+
+    /// <summary>
+    /// GTIN (Global Trade Item Number)
+    /// </summary>
+    [StringLength(50, ErrorMessage = "GTIN cannot exceed 50 characters")]
+    public string? Gtin { get; set; }
+
+    /// <summary>
+    /// ISBN for books
+    /// </summary>
+    [StringLength(50, ErrorMessage = "ISBN cannot exceed 50 characters")]
+    public string? Isbn { get; set; }
+
+    /// <summary>
     /// Stock quantity available
     /// </summary>
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity cannot be negative")]
     public int StockQuantity { get; set; } = 0;
 
     /// <summary>
+    /// Key features or bullet points for the product description
+    /// </summary>
+    public string? KeyFeatures { get; set; }
+
+    /// <summary>
     /// Indicates if the product is active
     /// </summary>
     public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Physical location of the inventory (e.g., "Warehouse", "Store")
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Inventory location cannot exceed 100 characters")]
+    public string? InventoryLocation { get; set; }
+
+    /// <summary>
+    /// Weight in pounds (lbs)
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Weight cannot be negative")]
+    public double Weight { get; set; }
+
+    /// <summary>
+    /// Height in inches
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Height cannot be negative")]
+    public double Height { get; set; }
+
+    /// <summary>
+    /// Width in inches
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Width cannot be negative")]
+    public double Width { get; set; }
+
+    /// <summary>
+    /// Length in inches
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Length cannot be negative")]
+    public double Length { get; set; }
+
+    /// <summary>
+    /// Indicates if the product is hazardous material
+    /// </summary>
+    public bool IsHazmat { get; set; }
+
+    /// <summary>
+    /// URL to the Safety Data Sheet (required if IsHazmat is true)
+    /// </summary>
+    [Url(ErrorMessage = "Safety data sheet URL must be a valid URL")]
+    public string? SafetyDataSheetUrl { get; set; }
+
+    /// <summary>
+    /// Lowest allowed price for automated repricing
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Floor price cannot be negative")]
+    public decimal? FloorPrice { get; set; }
+
+    /// <summary>
+    /// Highest allowed price for automated repricing
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Ceiling price cannot be negative")]
+    public decimal? CeilingPrice { get; set; }
 
     /// <summary>
     /// Category ID for the product
@@ -78,15 +154,91 @@ public class UpdateProductDto
     public string Sku { get; set; } = string.Empty;
 
     /// <summary>
+    /// UPC (Universal Product Code) - Global Barcode
+    /// </summary>
+    [StringLength(50, ErrorMessage = "UPC cannot exceed 50 characters")]
+    public string? Upc { get; set; }
+
+    /// <summary>
+    /// GTIN (Global Trade Item Number)
+    /// </summary>
+    [StringLength(50, ErrorMessage = "GTIN cannot exceed 50 characters")]
+    public string? Gtin { get; set; }
+
+    /// <summary>
+    /// ISBN for books
+    /// </summary>
+    [StringLength(50, ErrorMessage = "ISBN cannot exceed 50 characters")]
+    public string? Isbn { get; set; }
+
+    /// <summary>
     /// Stock quantity available
     /// </summary>
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity cannot be negative")]
     public int StockQuantity { get; set; }
 
     /// <summary>
+    /// Key features or bullet points for the product description
+    /// </summary>
+    public string? KeyFeatures { get; set; }
+
+    /// <summary>
     /// Indicates if the product is active
     /// </summary>
     public bool IsActive { get; set; }
+
+    /// <summary>
+    /// Physical location of the inventory (e.g., "Warehouse", "Store")
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Inventory location cannot exceed 100 characters")]
+    public string? InventoryLocation { get; set; }
+
+    /// <summary>
+    /// Weight in pounds (lbs)
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Weight cannot be negative")]
+    public double Weight { get; set; }
+
+    /// <summary>
+    /// Height in inches
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Height cannot be negative")]
+    public double Height { get; set; }
+
+    /// <summary>
+    /// Width in inches
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Width cannot be negative")]
+    public double Width { get; set; }
+
+    /// <summary>
+    /// Length in inches
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Length cannot be negative")]
+    public double Length { get; set; }
+
+    /// <summary>
+    /// Indicates if the product is hazardous material
+    /// </summary>
+    public bool IsHazmat { get; set; }
+
+    /// <summary>
+    /// URL to the Safety Data Sheet (required if IsHazmat is true)
+    /// </summary>
+    [Url(ErrorMessage = "Safety data sheet URL must be a valid URL")]
+    public string? SafetyDataSheetUrl { get; set; }
+
+    /// <summary>
+    /// Lowest allowed price for automated repricing
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Floor price cannot be negative")]
+    public decimal? FloorPrice { get; set; }
+
+    /// <summary>
+    /// Highest allowed price for automated repricing
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Ceiling price cannot be negative")]
+    public decimal? CeilingPrice { get; set; }
 
     /// <summary>
     /// Category ID for the product

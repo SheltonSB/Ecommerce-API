@@ -1,0 +1,171 @@
+digraph G {
+  rankdir=TB;
+  graph [fontsize=10, fontname="Helvetica", splines=true, overlap=false];
+  node  [shape=box, style="rounded,filled", fillcolor="#F7F7F7", color="#444444", fontsize=9, fontname="Helvetica"];
+  edge  [color="#666666", fontsize=8, fontname="Helvetica"];
+  subgraph cluster_1 {
+    label="Contracts";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Contracts.CreateProductWithImageDto" [label="CreateProductWithImageDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CreateSaleDto" [label="CreateSaleDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CreateSaleItemDto" [label="CreateSaleItemDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.UpdateSaleDto" [label="UpdateSaleDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.SaleDto" [label="SaleDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.SaleListItemDto" [label="SaleListItemDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.SaleItemDto" [label="SaleItemDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.PaymentInfoDto" [label="PaymentInfoDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CreatePaymentInfoDto" [label="CreatePaymentInfoDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CreateCategoryDto" [label="CreateCategoryDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.UpdateCategoryDto" [label="UpdateCategoryDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CategoryDto" [label="CategoryDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CategoryListItemDto" [label="CategoryListItemDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.PagedRequest" [label="PagedRequest\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.CreateProductDto" [label="CreateProductDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.UpdateProductDto" [label="UpdateProductDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.UpdateStockDto" [label="UpdateStockDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.ProductDto" [label="ProductDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.ProductListItemDto" [label="ProductListItemDto\nEcommerce.Api.Contracts"];
+    "Ecommerce.Api.Contracts.PriceHistoryDto" [label="PriceHistoryDto\nEcommerce.Api.Contracts"];
+  }
+  subgraph cluster_2 {
+    label="Controllers";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Controllers.CheckoutController" [label="CheckoutController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.CategoriesController" [label="CategoriesController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.ProductsController" [label="ProductsController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.SalesController" [label="SalesController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.AnalyticsController" [label="AnalyticsController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.AdminController" [label="AdminController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.AuthController" [label="AuthController\nEcommerce.Api.Controllers"];
+    "Ecommerce.Api.Controllers.RegisterUserDtoValidator" [label="RegisterUserDtoValidator\nEcommerce.Api.Controllers"];
+  }
+  subgraph cluster_3 {
+    label="Data";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Data.AppDbContext" [label="AppDbContext\nEcommerce.Api.Data"];
+    "Ecommerce.Api.Data.DataSeeder" [label="DataSeeder\nEcommerce.Api.Data"];
+    "Ecommerce.Api.Data.DesignTimeAppDbContextFactory" [label="DesignTimeAppDbContextFactory\nEcommerce.Api.Data"];
+    "Ecommerce.Api.Data.AdminSeeder" [label="AdminSeeder\nEcommerce.Api.Data"];
+    "Ecommerce.Api.Data.Seed" [label="Seed\nEcommerce.Api.Data"];
+  }
+  subgraph cluster_4 {
+    label="Domain";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Domain.SaleItem" [label="SaleItem\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.UserInteraction" [label="UserInteraction\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.Category" [label="Category\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.Sale" [label="Sale\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.PaymentInfo" [label="PaymentInfo\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.PriceHistory" [label="PriceHistory\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.ApplicationUser" [label="ApplicationUser\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.Entity" [label="Entity\nEcommerce.Api.Domain"];
+    "Ecommerce.Api.Domain.Product" [label="Product\nEcommerce.Api.Domain"];
+  }
+  subgraph cluster_5 {
+    label="Infrastructure";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Infrastructure.AuditMiddleware" [label="AuditMiddleware\nEcommerce.Api.Infrastructure"];
+    "Ecommerce.Api.Infrastructure.ICacheProvider" [label="ICacheProvider\nEcommerce.Api.Infrastructure"];
+    "Ecommerce.Api.Infrastructure.DistributedCacheProvider" [label="DistributedCacheProvider\nEcommerce.Api.Infrastructure"];
+    "Ecommerce.Api.Infrastructure.QueryableExtensions" [label="QueryableExtensions\nEcommerce.Api.Infrastructure"];
+    "Ecommerce.Api.Infrastructure.MemoryCacheProvider" [label="MemoryCacheProvider\nEcommerce.Api.Infrastructure"];
+    "Ecommerce.Api.Infrastructure.GlobalExceptionMiddleware" [label="GlobalExceptionMiddleware\nEcommerce.Api.Infrastructure"];
+    "Ecommerce.Api.Infrastructure.ErrorResponse" [label="ErrorResponse\nEcommerce.Api.Infrastructure"];
+  }
+  subgraph cluster_6 {
+    label="Migrations";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Migrations.AddAnalytics" [label="AddAnalytics\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.InitialPostgres" [label="InitialPostgres\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.AddProductImageUrl" [label="AddProductImageUrl\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.AppDbContextModelSnapshot" [label="AppDbContextModelSnapshot\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.InitialPostgres" [label="InitialPostgres\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.AddEnterpriseProductFields" [label="AddEnterpriseProductFields\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.AddEnterpriseProductFields" [label="AddEnterpriseProductFields\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.AddProductImageUrl" [label="AddProductImageUrl\nEcommerce.Api.Migrations"];
+    "Ecommerce.Api.Migrations.AddAnalytics" [label="AddAnalytics\nEcommerce.Api.Migrations"];
+  }
+  subgraph cluster_7 {
+    label="Root";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Program" [label="Program\nEcommerce.Api"];
+    "Ecommerce.Api.Middleware.GlobalExceptionHandlerMiddleware" [label="GlobalExceptionHandlerMiddleware\nEcommerce.Api.Middleware"];
+    "Ecommerce.Api.Controllers.Admin.AdminProductsController" [label="AdminProductsController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.Controllers.Admin.DashboardController" [label="DashboardController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.Controllers.Admin.AdminPhotosController" [label="AdminPhotosController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.Controllers.Admin.DataSeedingController" [label="DataSeedingController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.Controllers.Admin.AdminSalesController" [label="AdminSalesController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.SecretsValidator" [label="SecretsValidator\nEcommerce.Api"];
+    "Ecommerce.Api.Controllers.Admin.AdminUsersController" [label="AdminUsersController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.Mappings.MappingProfile" [label="MappingProfile\nEcommerce.Api.Mappings"];
+    "Program" [label="Program"];
+  }
+  subgraph cluster_8 {
+    label="Services";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Services.DummyEmailService" [label="DummyEmailService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.ProductService" [label="ProductService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.IEmailService" [label="IEmailService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.IPhotoService" [label="IPhotoService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.IEmailSender" [label="IEmailSender\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.PhotoService" [label="PhotoService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.CategoryService" [label="CategoryService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.ISaleService" [label="ISaleService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.IProductService" [label="IProductService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.ICategoryService" [label="ICategoryService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.EmailSender" [label="EmailSender\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.ImageService" [label="ImageService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Controllers.Admin.AiAgentController" [label="AiAgentController\nEcommerce.Api.Controllers.Admin"];
+    "Ecommerce.Api.Services.SaleService" [label="SaleService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.AnalyticsService" [label="AnalyticsService\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Contracts.Analytics.AiTrendReportDto" [label="AiTrendReportDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Contracts.Analytics.SalesTrendPointDto" [label="SalesTrendPointDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Contracts.Analytics.ProductPerformanceDto" [label="ProductPerformanceDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Contracts.Analytics.CategoryPerformanceDto" [label="CategoryPerformanceDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Contracts.Analytics.GeospatialPerformanceDto" [label="GeospatialPerformanceDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Contracts.Analytics.SalesForecastDto" [label="SalesForecastDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Contracts.Analytics.StrategicRecommendationsDto" [label="StrategicRecommendationsDto\nEcommerce.Api.Contracts.Analytics"];
+    "Ecommerce.Api.Services.CloudinarySettings" [label="CloudinarySettings\nEcommerce.Api.Services"];
+    "Ecommerce.Api.Services.IAnalyticsService" [label="IAnalyticsService\nEcommerce.Api.Services"];
+  }
+  subgraph cluster_9 {
+    label="core";
+    color="#BBBBBB"; style="rounded";
+    "Ecommerce.Api.Core.MappingProfile" [label="MappingProfile\nEcommerce.Api.Core"];
+  }
+  "Ecommerce.Api.Infrastructure.DistributedCacheProvider" -> "Ecommerce.Api.Infrastructure.ICacheProvider" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Infrastructure.MemoryCacheProvider" -> "Ecommerce.Api.Infrastructure.ICacheProvider" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Domain.SaleItem" -> "Ecommerce.Api.Domain.Entity" [arrowhead=empty, style=solid, color="#2B6CB0"];
+  "Ecommerce.Api.Domain.Category" -> "Ecommerce.Api.Domain.Entity" [arrowhead=empty, style=solid, color="#2B6CB0"];
+  "Ecommerce.Api.Domain.Sale" -> "Ecommerce.Api.Domain.Entity" [arrowhead=empty, style=solid, color="#2B6CB0"];
+  "Ecommerce.Api.Domain.PaymentInfo" -> "Ecommerce.Api.Domain.Entity" [arrowhead=empty, style=solid, color="#2B6CB0"];
+  "Ecommerce.Api.Domain.PriceHistory" -> "Ecommerce.Api.Domain.Entity" [arrowhead=empty, style=solid, color="#2B6CB0"];
+  "Ecommerce.Api.Domain.Product" -> "Ecommerce.Api.Domain.Entity" [arrowhead=empty, style=solid, color="#2B6CB0"];
+  "Ecommerce.Api.Services.DummyEmailService" -> "Ecommerce.Api.Services.IEmailService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.ProductService" -> "Ecommerce.Api.Services.IProductService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.PhotoService" -> "Ecommerce.Api.Services.IPhotoService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.CategoryService" -> "Ecommerce.Api.Services.ICategoryService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.EmailSender" -> "Ecommerce.Api.Services.IEmailSender" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.EmailSender" -> "Ecommerce.Api.Services.IEmailService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.SaleService" -> "Ecommerce.Api.Services.ISaleService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Services.AnalyticsService" -> "Ecommerce.Api.Services.IAnalyticsService" [arrowhead=empty, style=dashed, color="#2B6CB0"];
+  "Ecommerce.Api.Controllers.Admin.AdminProductsController" -> "Ecommerce.Api.Services.IProductService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.Admin.DashboardController" -> "Ecommerce.Api.Services.ISaleService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.Admin.AdminPhotosController" -> "Ecommerce.Api.Services.IPhotoService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.Admin.DataSeedingController" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.Admin.AdminSalesController" -> "Ecommerce.Api.Services.ISaleService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.CheckoutController" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.CategoriesController" -> "Ecommerce.Api.Services.ICategoryService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.ProductsController" -> "Ecommerce.Api.Services.IProductService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.SalesController" -> "Ecommerce.Api.Services.ISaleService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.AnalyticsController" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.AdminController" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.AdminController" -> "Ecommerce.Api.Services.ImageService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.AuthController" -> "Ecommerce.Api.Services.IEmailService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Services.ProductService" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Services.ProductService" -> "Ecommerce.Api.Infrastructure.ICacheProvider" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Services.CategoryService" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Controllers.Admin.AiAgentController" -> "Ecommerce.Api.Services.IAnalyticsService" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Services.SaleService" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+  "Ecommerce.Api.Services.AnalyticsService" -> "Ecommerce.Api.Data.AppDbContext" [style=dotted, arrowhead=vee, color="#888888"];
+}

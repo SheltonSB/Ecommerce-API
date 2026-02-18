@@ -30,6 +30,12 @@ public class CheckoutController : ControllerBase
     public async Task<IActionResult> CreateSession([FromBody] CheckoutRequestDto request)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var publishableKey = _configuration["Stripe:PublishableKey"];
+        if (string.IsNullOrWhiteSpace(publishableKey))
+        {
+            return StatusCode(500, "Stripe publishable key is not configured.");
+        }
+
         var productIds = request.Items.Select(i => i.ProductId).ToList();
         var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
 
@@ -67,6 +73,6 @@ public class CheckoutController : ControllerBase
 
         var service = new SessionService();
         Session session = await _resiliencePolicy.ExecuteAsync(() => service.CreateAsync(options));
-        return Ok(new CheckoutResponseDto(session.Url));
+        return Ok(new CheckoutResponseDto(session.Url ?? string.Empty, session.Id, publishableKey));
     }
 }

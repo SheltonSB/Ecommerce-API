@@ -9,6 +9,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+type CheckoutResponse = {
+  url: string;
+  sessionId: string;
+  publishableKey: string;
+};
+
+type StripeClient = {
+  redirectToCheckout: (options: { sessionId: string }) => Promise<{ error?: { message?: string } }>;
+};
+
+declare global {
+  interface Window {
+    Stripe?: (publishableKey: string) => StripeClient;
+  }
+}
+
+let stripeJsLoadPromise: Promise<void> | null = null;
+
 const checkoutSchema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -17,14 +35,30 @@ const checkoutSchema = z.object({
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
-// This function simulates calling our backend API
-const createCheckoutSession = async (cartItems: { productId: number; quantity: number }[]) => {
+const loadStripeJs = async () => {
+  if (window.Stripe) return;
+
+  if (!stripeJsLoadPromise) {
+    stripeJsLoadPromise = new Promise<void>((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://js.stripe.com/v3";
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error("Failed to load Stripe.js."));
+      document.head.appendChild(script);
+    });
+  }
+
+  await stripeJsLoadPromise;
+};
+
+const createCheckoutSession = async (cartItems: { productId: number; quantity: number }[]): Promise<CheckoutResponse> => {
   const response = await fetch(`${import.meta.env.VITE_API_URL}/api/checkout`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       // The auth token would be dynamically retrieved from an auth context/hook
-      'Authorization': `Bearer ${localStorage.getItem("authToken")}`
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`
     },
     body: JSON.stringify({ items: cartItems }),
   });
@@ -36,6 +70,21 @@ const createCheckoutSession = async (cartItems: { productId: number; quantity: n
   return response.json();
 };
 
+const redirectToStripeCheckout = async (data: CheckoutResponse) => {
+  await loadStripeJs();
+
+  if (!window.Stripe) {
+    throw new Error("Stripe.js failed to initialize.");
+  }
+
+  const stripe = window.Stripe(data.publishableKey);
+  const result = await stripe.redirectToCheckout({ sessionId: data.sessionId });
+
+  if (result.error?.message) {
+    throw new Error(result.error.message);
+  }
+};
+
 const CheckoutPage = () => {
   const { items, totalPrice, totalItems } = useCart();
 
@@ -45,10 +94,15 @@ const CheckoutPage = () => {
 
   const checkoutMutation = useMutation({
     mutationFn: createCheckoutSession,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Redirecting to payment...");
-      // Redirect to the Stripe URL returned by the backend
-      window.location.href = data.url;
+
+      try {
+        await redirectToStripeCheckout(data);
+      } catch {
+        // Fallback for any Stripe.js load/runtime failure
+        window.location.href = data.url;
+      }
     },
     onError: () => {
       toast.error("There was an issue processing your order. Please try again.");

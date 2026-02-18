@@ -18,5 +18,11 @@ public static class SecretsValidator
         {
             throw new InvalidOperationException("CRITICAL ERROR: Stripe Secret Key ('Stripe:SecretKey') is not configured. Application cannot start.");
         }
+
+        var stripePublishableKey = configuration["Stripe:PublishableKey"];
+        if (string.IsNullOrEmpty(stripePublishableKey))
+        {
+            throw new InvalidOperationException("CRITICAL ERROR: Stripe Publishable Key ('Stripe:PublishableKey') is not configured. Application cannot start.");
+        }
     }
 }

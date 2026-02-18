@@ -1,8 +1,6 @@
-import { useCart } from "@/contexts/CartContext";
-import { Navigate } from "react-router-dom";
+import { useCart } from "@/CartContext";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,14 +24,12 @@ declare global {
 }
 
 let stripeJsLoadPromise: Promise<void> | null = null;
-
-const checkoutSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  address: z.string().min(5, "Address is required"),
-});
-
-type CheckoutFormValues = z.infer<typeof checkoutSchema>;
+const apiBaseUrl = import.meta.env.VITE_API_URL || "";
+type CheckoutFormValues = {
+  name: string;
+  email: string;
+  address: string;
+};
 
 const loadStripeJs = async () => {
   if (window.Stripe) return;
@@ -53,12 +49,12 @@ const loadStripeJs = async () => {
 };
 
 const createCheckoutSession = async (cartItems: { productId: number; quantity: number }[]): Promise<CheckoutResponse> => {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/checkout`, {
+  const authToken = localStorage.getItem("authToken");
+  const response = await fetch(`${apiBaseUrl}/api/checkout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // The auth token would be dynamically retrieved from an auth context/hook
-      Authorization: `Bearer ${localStorage.getItem("authToken")}`
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {})
     },
     body: JSON.stringify({ items: cartItems }),
   });
@@ -87,10 +83,9 @@ const redirectToStripeCheckout = async (data: CheckoutResponse) => {
 
 const CheckoutPage = () => {
   const { items, totalPrice, totalItems } = useCart();
+  const navigate = useNavigate();
 
-  const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormValues>({
-    resolver: zodResolver(checkoutSchema),
-  });
+  const { register, handleSubmit, formState: { errors } } = useForm<CheckoutFormValues>();
 
   const checkoutMutation = useMutation({
     mutationFn: createCheckoutSession,
@@ -101,7 +96,12 @@ const CheckoutPage = () => {
         await redirectToStripeCheckout(data);
       } catch {
         // Fallback for any Stripe.js load/runtime failure
-        window.location.href = data.url;
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+
+        toast.error("Unable to redirect to Stripe checkout.");
       }
     },
     onError: () => {
@@ -109,8 +109,14 @@ const CheckoutPage = () => {
     },
   });
 
-  const onSubmit = (data: CheckoutFormValues) => {
-    console.log("Customer Info:", data);
+  const onSubmit = (_data: CheckoutFormValues) => {
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) {
+      toast.error("Please sign in before checking out.");
+      navigate("/login", { state: { from: "/checkout" } });
+      return;
+    }
+
     const cartItems = items.map(item => ({ productId: item.id, quantity: item.quantity }));
     checkoutMutation.mutate(cartItems);
   };
@@ -124,13 +130,34 @@ const CheckoutPage = () => {
       <div>
         <h1 className="font-display text-3xl mb-6">Contact & Shipping</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input placeholder="Full Name" {...register("name")} />
+          <Input
+            placeholder="Full Name"
+            {...register("name", {
+              required: "Name is required",
+              minLength: { value: 2, message: "Name is required" },
+            })}
+          />
           {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
           
-          <Input placeholder="Email Address" {...register("email")} />
+          <Input
+            placeholder="Email Address"
+            {...register("email", {
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Invalid email address",
+              },
+            })}
+          />
           {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
 
-          <Input placeholder="Shipping Address" {...register("address")} />
+          <Input
+            placeholder="Shipping Address"
+            {...register("address", {
+              required: "Address is required",
+              minLength: { value: 5, message: "Address is required" },
+            })}
+          />
           {errors.address && <p className="text-red-500 text-sm">{errors.address.message}</p>}
 
           <Button type="submit" className="w-full" disabled={checkoutMutation.isPending}>

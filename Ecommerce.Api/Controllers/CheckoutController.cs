@@ -36,6 +36,28 @@ public class CheckoutController : ControllerBase
             return StatusCode(500, "Stripe publishable key is not configured.");
         }
 
+        var frontendBaseUrl = _configuration["FrontendURL"];
+        if (string.IsNullOrWhiteSpace(frontendBaseUrl) ||
+            frontendBaseUrl.Contains("your-production-domain.com", StringComparison.OrdinalIgnoreCase))
+        {
+            frontendBaseUrl = Request.Headers.Origin.FirstOrDefault() ?? $"{Request.Scheme}://{Request.Host}";
+        }
+        frontendBaseUrl = frontendBaseUrl.TrimEnd('/');
+
+        var successUrl = _configuration["StripeSuccessUrl"];
+        if (string.IsNullOrWhiteSpace(successUrl) ||
+            successUrl.Contains("your-production-domain.com", StringComparison.OrdinalIgnoreCase))
+        {
+            successUrl = $"{frontendBaseUrl}/success";
+        }
+
+        var cancelUrl = _configuration["StripeCancelUrl"];
+        if (string.IsNullOrWhiteSpace(cancelUrl) ||
+            cancelUrl.Contains("your-production-domain.com", StringComparison.OrdinalIgnoreCase))
+        {
+            cancelUrl = $"{frontendBaseUrl}/cart";
+        }
+
         var productIds = request.Items.Select(i => i.ProductId).ToList();
         var products = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
 
@@ -61,8 +83,8 @@ public class CheckoutController : ControllerBase
         {
             LineItems = lineItems,
             Mode = "payment",
-            SuccessUrl = $"{_configuration["FrontendURL"]}/success",
-            CancelUrl = $"{_configuration["FrontendURL"]}/cart",
+            SuccessUrl = successUrl,
+            CancelUrl = cancelUrl,
             Metadata = new Dictionary<string, string>()
         };
 

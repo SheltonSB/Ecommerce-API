@@ -74,17 +74,48 @@ builder.Services.AddCors(options =>
     var vercelUrl = builder.Configuration["VercelUrl"] ?? builder.Configuration["VERCEL_URL"];
 
     var allowedOrigins = new List<string>();
-    if (!string.IsNullOrWhiteSpace(frontendURL))
+    void AddOriginIfValid(string? rawOrigin)
     {
-        allowedOrigins.Add(frontendURL.TrimEnd('/'));
+        if (string.IsNullOrWhiteSpace(rawOrigin))
+        {
+            return;
+        }
+
+        if (rawOrigin.Contains("your-production-domain.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var normalized = rawOrigin.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            ? rawOrigin
+            : $"https://{rawOrigin}";
+
+        if (!Uri.TryCreate(normalized, UriKind.Absolute, out var parsed) ||
+            (parsed.Scheme != Uri.UriSchemeHttp && parsed.Scheme != Uri.UriSchemeHttps))
+        {
+            return;
+        }
+
+        allowedOrigins.Add($"{parsed.Scheme}://{parsed.Authority}");
     }
 
-    if (!string.IsNullOrWhiteSpace(vercelUrl))
+    AddOriginIfValid(frontendURL);
+    AddOriginIfValid(vercelUrl);
+
+    if (builder.Environment.IsDevelopment())
     {
-        var normalized = vercelUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase)
-            ? vercelUrl
-            : $"https://{vercelUrl}";
-        allowedOrigins.Add(normalized.TrimEnd('/'));
+        AddOriginIfValid("http://localhost:5173");
+        AddOriginIfValid("https://localhost:5173");
+        AddOriginIfValid("http://127.0.0.1:5173");
+    }
+
+    allowedOrigins = allowedOrigins
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToList();
+
+    if (allowedOrigins.Count == 0)
+    {
+        throw new InvalidOperationException("No valid CORS frontend origins configured.");
     }
 
     Console.WriteLine($"[CORS] Configured Allowed Origins: {string.Join(", ", allowedOrigins)}");

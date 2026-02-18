@@ -11,29 +11,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { toast } from 'sonner';
 import ImageUpload from '@/components/ui/ImageUpload';
+const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
 /**
  * Defines the validation schema for the product form using Zod.
  * This ensures that the data submitted for a new product matches the expected format and constraints.
  */
-const productSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  description: z.string().min(1, 'Description is required'),
-  price: z.coerce.number().min(0.01, 'Price must be positive'),
-  stockQuantity: z.coerce.number().int().min(0, 'Stock cannot be negative'),
-  categoryId: z.coerce.number().int().min(1, 'Category ID is required'),
-  imageUrl: z.string().url('A valid image URL is required').optional(),
-});
-
-/**
- * Type definition for the product form values, inferred from the Zod schema.
- * This provides strong typing for the form data.
- */
-type ProductFormValues = z.infer<typeof productSchema>;
+type ProductFormValues = {
+  name: string;
+  sku: string;
+  description: string;
+  price: number;
+  stockQuantity: number;
+  categoryId: number;
+  imageUrl?: string;
+};
 
 /**
  * Fetches the list of all products from the API.
@@ -41,7 +35,7 @@ type ProductFormValues = z.infer<typeof productSchema>;
  * @returns {Promise<any[]>} A promise that resolves to an array of products.
  */
 const getProducts = async () => {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+  const response = await fetch(`${apiBaseUrl}/api/products`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${localStorage.getItem("authToken")}`,
@@ -50,7 +44,8 @@ const getProducts = async () => {
   if (!response.ok) {
     throw new Error('Failed to fetch products');
   }
-  return response.json();
+  const payload = await response.json();
+  return Array.isArray(payload) ? payload : (payload.items ?? []);
 };
 
 /**
@@ -61,7 +56,7 @@ const getProducts = async () => {
  * @throws {Error} If the API response is not ok.
  */
 const createProduct = async (productData: ProductFormValues) => {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/products`, {
+  const response = await fetch(`${apiBaseUrl}/api/products`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -93,7 +88,6 @@ const AdminProducts = () => {
   // React Hook Form setup for managing the product creation form.
   // It uses Zod for validation and sets a default categoryId.
   const { control, register, handleSubmit, formState: { errors }, reset } = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
     defaultValues: {
       categoryId: 1 // Default to a category
     }
@@ -108,14 +102,17 @@ const AdminProducts = () => {
       setIsModalOpen(false);
       reset(); // Reset the form fields after successful submission.
     },
-    onError: (error) => {
-      toast.error(error.message);
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : 'Failed to create product');
     }
   });
 
   const onSubmit = (data: ProductFormValues) => {
     // Trigger the mutation to create the product.
-    createMutation.mutate(data);
+    createMutation.mutate({
+      ...data,
+      imageUrl: data.imageUrl?.trim() || undefined,
+    });
   };
 
   return (
@@ -143,15 +140,47 @@ const AdminProducts = () => {
                 )}
               />
               {/* Form fields with validation messages */}
-              <Input placeholder="Product Name" {...register('name')} />
+              <Input placeholder="Product Name" {...register('name', { required: 'Name is required' })} />
               {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
-              <Textarea placeholder="Description" {...register('description')} />
+              <Input
+                placeholder="SKU"
+                {...register('sku', {
+                  required: 'SKU is required',
+                  minLength: { value: 3, message: 'SKU must be at least 3 characters' }
+                })}
+              />
+              {errors.sku && <p className="text-red-500 text-sm">{errors.sku.message}</p>}
+              <Textarea placeholder="Description" {...register('description', { required: 'Description is required' })} />
               {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
-              <Input type="number" placeholder="Price" {...register('price', { valueAsNumber: true })} />
+              <Input
+                type="number"
+                placeholder="Price"
+                {...register('price', {
+                  valueAsNumber: true,
+                  required: 'Price is required',
+                  min: { value: 0.01, message: 'Price must be positive' }
+                })}
+              />
               {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
-              <Input type="number" placeholder="Stock Quantity" {...register('stockQuantity', { valueAsNumber: true })} />
+              <Input
+                type="number"
+                placeholder="Stock Quantity"
+                {...register('stockQuantity', {
+                  valueAsNumber: true,
+                  required: 'Stock quantity is required',
+                  min: { value: 0, message: 'Stock cannot be negative' }
+                })}
+              />
               {errors.stockQuantity && <p className="text-red-500 text-sm">{errors.stockQuantity.message}</p>}
-              <Input type="number" placeholder="Category ID" {...register('categoryId', { valueAsNumber: true })} />
+              <Input
+                type="number"
+                placeholder="Category ID"
+                {...register('categoryId', {
+                  valueAsNumber: true,
+                  required: 'Category ID is required',
+                  min: { value: 1, message: 'Category ID is required' }
+                })}
+              />
               {errors.categoryId && <p className="text-red-500 text-sm">{errors.categoryId.message}</p>}
               {errors.imageUrl && <p className="text-red-500 text-sm">{errors.imageUrl.message}</p>}
               <Button type="submit" disabled={createMutation.isPending}>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, X } from 'lucide-react';
 import { toast } from 'sonner';
+const apiBaseUrl = import.meta.env.VITE_API_URL || '';
 
 interface ImageUploadProps {
   value: string;
@@ -20,7 +21,7 @@ const ImageUpload = ({ value, onChange }: ImageUploadProps) => {
     formData.append('file', file);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/photos/upload`, {
+      const response = await fetch(`${apiBaseUrl}/api/admin/photos/upload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("authToken")}`,
@@ -33,7 +34,7 @@ const ImageUpload = ({ value, onChange }: ImageUploadProps) => {
       const data = await response.json();
       onChange(data.url);
       toast.success('Image uploaded successfully!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to upload image.');
     } finally {
       setIsUploading(false);

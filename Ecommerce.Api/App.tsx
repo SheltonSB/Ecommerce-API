@@ -1,14 +1,15 @@
 import { Route, Routes } from "react-router-dom"
-import Layout from "./components/Layout"
-import Store from "./pages/Store"
-import CartPage from "./pages/CartPage"
-import CheckoutPage from "./pages/CheckoutPage"
-import ProductDetail from "./pages/ProductDetail"
-import AdminLayout from "./components/admin/AdminLayout"
-import AdminDashboard from "./pages/admin/AdminDashboard"
-import AdminProducts from "./pages/admin/AdminProducts"
-import AdminLogin from "./pages/admin/AdminLogin"
-import ProtectedRoute from "./components/admin/ProtectedRoute"
+import Layout from "./Layout"
+import Store from "./Store"
+import CartPage from "./CartPage"
+import CheckoutPage from "./CheckoutPage"
+import ProductDetail from "./ProductDetail"
+import CheckoutSuccess from "./CheckoutSuccess"
+import AdminLayout from "./AdminLayout"
+import AdminDashboard from "./AdminDashboard"
+import AdminProducts from "./AdminProducts"
+import AdminLogin from "./AdminLogin"
+import ProtectedRoute from "./ProtectedRoute"
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
           <Route index element={<Store />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="success" element={<CheckoutSuccess />} />
+          <Route path="login" element={<AdminLogin />} />
           <Route path="products/:id" element={<ProductDetail />} />
         </Route>
 

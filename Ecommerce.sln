@@ -1,4 +1,11 @@
-﻿
+# This Solution File manages the Ecommerce platform.
+# - Ecommerce.Api: The main backend web service (ASP.NET Core).
+# - Ecommerce.Tests: Automated unit and integration tests.
+# - Configuration: Maps build settings (Debug/Release) to CPU architectures.
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+...﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59

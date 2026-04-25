@@ -1,5 +1,6 @@
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
@@ -78,6 +79,7 @@ public class CategoriesController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<CategoryDto>> Create([FromBody] CreateCategoryDto dto)
     {
         if (!ModelState.IsValid)
@@ -102,6 +104,7 @@ public class CategoriesController : ControllerBase
     [ProducesResponseType(typeof(CategoryDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<CategoryDto>> Update(int id, [FromBody] UpdateCategoryDto dto)
     {
         if (!ModelState.IsValid)
@@ -123,6 +126,7 @@ public class CategoriesController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _categoryService.DeleteAsync(id);
@@ -143,6 +147,7 @@ public class CategoriesController : ControllerBase
     [HttpPost("{id}/restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Restore(int id)
     {
         var result = await _categoryService.RestoreAsync(id);
@@ -153,4 +158,3 @@ public class CategoriesController : ControllerBase
         return NoContent();
     }
 }
-

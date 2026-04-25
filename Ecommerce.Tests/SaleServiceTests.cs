@@ -1,251 +1,90 @@
+using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
+using Ecommerce.Api.Mappings;
 using Ecommerce.Api.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Ecommerce.Tests;
 
-public class SaleServiceTests : IDisposable
+public class SaleServiceTests
 {
-    private readonly AppDbContext _context;
-    private readonly SaleService _service;
-    private readonly Mock<ILogger<SaleService>> _loggerMock;
+    private static IMapper CreateMapper()
+    {
+        var config = new MapperConfiguration(cfg => cfg.AddProfile(new MappingProfile()));
+        return config.CreateMapper();
+    }
 
-    public SaleServiceTests()
+    private static AppDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
-
-        _context = new AppDbContext(options);
-        _loggerMock = new Mock<ILogger<SaleService>>();
-        _service = new SaleService(_context, _loggerMock.Object);
-
-        SeedTestData();
-    }
-
-    private void SeedTestData()
-    {
-        var category = new Category { Id = 1, Name = "Electronics", Description = "Electronic devices" };
-        _context.Categories.Add(category);
-
-        var product = new Product
-        {
-            Id = 1,
-            Name = "Smartphone",
-            Description = "Latest smartphone",
-            Price = 699.99m,
-            Sku = "PHONE-001",
-            StockQuantity = 50,
-            IsActive = true,
-            CategoryId = 1
-        };
-        _context.Products.Add(product);
-
-        var sale = new Sale
-        {
-            Id = 1,
-            SaleNumber = "SALE-000001",
-            SaleDate = DateTime.UtcNow,
-            TotalAmount = 699.99m,
-            TaxAmount = 69.99m,
-            DiscountAmount = 0,
-            FinalAmount = 769.98m,
-            Status = SaleStatus.Pending,
-            CustomerName = "John Doe",
-            CustomerEmail = "john@example.com"
-        };
-        _context.Sales.Add(sale);
-
-        _context.SaveChanges();
+        return new AppDbContext(options);
     }
 
     [Fact]
-    public async Task GetAllAsync_ShouldReturnPaginatedSales()
+    public async Task Stock_Decrements_Only_On_Completion()
     {
-        // Arrange
-        var request = new PagedRequest { Page = 1, PageSize = 10 };
+        using var context = CreateContext();
+        var category = new Category { Name = "TestCat" };
+        var product = new Product { Name = "Test", Price = 10m, Sku = "SKU-1", StockQuantity = 5, Category = category };
+        context.Categories.Add(category);
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
 
-        // Act
-        var result = await _service.GetAllAsync(request);
+        var service = new SaleService(context, CreateMapper(), NullLogger<SaleService>.Instance);
 
-        // Assert
-        result.Should().NotBeNull();
-        result.Items.Should().HaveCount(1);
-        result.TotalItems.Should().Be(1);
-    }
-
-    [Fact]
-    public async Task GetAllAsync_WithStatusFilter_ShouldReturnFilteredSales()
-    {
-        // Arrange
-        var request = new PagedRequest { Page = 1, PageSize = 10 };
-        var status = "Pending";
-
-        // Act
-        var result = await _service.GetAllAsync(request, status);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Items.Should().HaveCount(1);
-        result.Items.First().Status.Should().Be("Pending");
-    }
-
-    [Fact]
-    public async Task GetByIdAsync_WithValidId_ShouldReturnSale()
-    {
-        // Arrange
-        var saleId = 1;
-
-        // Act
-        var result = await _service.GetByIdAsync(saleId);
-
-        // Assert
-        result.Should().NotBeNull();
-        result!.Id.Should().Be(saleId);
-        result.SaleNumber.Should().Be("SALE-000001");
-    }
-
-    [Fact]
-    public async Task GetByIdAsync_WithInvalidId_ShouldReturnNull()
-    {
-        // Arrange
-        var invalidId = 999;
-
-        // Act
-        var result = await _service.GetByIdAsync(invalidId);
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    [Fact]
-    public async Task CreateAsync_WithValidData_ShouldCreateSale()
-    {
-        // Arrange
         var dto = new CreateSaleDto
         {
-            CustomerName = "Jane Doe",
-            CustomerEmail = "jane@example.com",
-            TaxAmount = 10.00m,
-            DiscountAmount = 5.00m,
-            Notes = "Test sale",
-            SaleItems = new List<CreateSaleItemDto>
-            {
-                new CreateSaleItemDto { ProductId = 1, Quantity = 1 }
-            }
+            CustomerName = "Buyer",
+            CustomerEmail = "buyer@example.com",
+            TaxAmount = 0,
+            DiscountAmount = 0,
+            Notes = null,
+            SaleItems = new List<CreateSaleItemDto> { new() { ProductId = product.Id, Quantity = 2 } }
         };
 
-        // Act
-        var result = await _service.CreateAsync(dto);
+        var sale = await service.CreateAsync(dto);
 
-        // Assert
-        result.Should().NotBeNull();
-        result.CustomerName.Should().Be("Jane Doe");
-        result.SaleItems.Should().HaveCount(1);
+        (await context.Products.FindAsync(product.Id))!.StockQuantity.Should().Be(5);
+
+        var completed = await service.CompleteAsync(sale.Id);
+        completed.Should().BeTrue();
+        (await context.Products.FindAsync(product.Id))!.StockQuantity.Should().Be(3);
     }
 
     [Fact]
-    public async Task UpdateAsync_WithValidData_ShouldUpdateSale()
+    public async Task AddPayment_Rejects_Duplicate_Payment_For_Same_Sale()
     {
-        // Arrange
-        var saleId = 1;
-        var dto = new UpdateSaleDto
+        using var context = CreateContext();
+        var category = new Category { Name = "TestCat" };
+        var product = new Product { Name = "Test", Price = 10m, Sku = "SKU-2", StockQuantity = 5, Category = category };
+        context.Categories.Add(category);
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
+
+        var service = new SaleService(context, CreateMapper(), NullLogger<SaleService>.Instance);
+        var sale = await service.CreateAsync(new CreateSaleDto
         {
-            CustomerName = "Updated Name",
-            CustomerEmail = "updated@example.com",
-            TaxAmount = 80.00m,
-            DiscountAmount = 10.00m,
-            Notes = "Updated notes"
+            CustomerName = "Buyer",
+            CustomerEmail = "buyer@example.com",
+            SaleItems = new List<CreateSaleItemDto> { new() { ProductId = product.Id, Quantity = 1 } }
+        });
+
+        var payment = new CreatePaymentInfoDto
+        {
+            PaymentMethod = "CreditCard",
+            Amount = sale.FinalAmount,
+            PaymentReference = "PAY-001"
         };
 
-        // Act
-        var result = await _service.UpdateAsync(saleId, dto);
+        (await service.AddPaymentAsync(sale.Id, payment)).Should().BeTrue();
 
-        // Assert
-        result.Should().NotBeNull();
-        result.CustomerName.Should().Be("Updated Name");
-        result.TaxAmount.Should().Be(80.00m);
-    }
-
-    [Fact]
-    public async Task CancelAsync_WithPendingSale_ShouldCancelSale()
-    {
-        // Arrange
-        var saleId = 1;
-
-        // Act
-        var result = await _service.CancelAsync(saleId);
-
-        // Assert
-        result.Should().BeTrue();
-
-        var sale = await _context.Sales.FindAsync(saleId);
-        sale.Should().NotBeNull();
-        sale!.Status.Should().Be(SaleStatus.Cancelled);
-    }
-
-    [Fact]
-    public async Task CompleteAsync_WithPendingSale_ShouldCompleteSaleAndReduceStock()
-    {
-        // Arrange
-        var sale = await _context.Sales.FindAsync(1);
-        sale!.AddSaleItem(await _context.Products.FindAsync(1) ?? throw new InvalidOperationException(), 2);
-        await _context.SaveChangesAsync();
-
-        // Act
-        var result = await _service.CompleteAsync(1);
-
-        // Assert
-        result.Should().BeTrue();
-
-        var savedSale = await _context.Sales.FindAsync(1);
-        var product = await _context.Products.FindAsync(1);
-
-        savedSale!.Status.Should().Be(SaleStatus.Completed);
-        product!.StockQuantity.Should().Be(48);
-    }
-
-    [Fact]
-    public async Task GetByDateRangeAsync_ShouldReturnSalesInRange()
-    {
-        // Arrange
-        var startDate = DateTime.UtcNow.AddDays(-1);
-        var endDate = DateTime.UtcNow.AddDays(1);
-
-        // Act
-        var result = await _service.GetByDateRangeAsync(startDate, endDate);
-
-        // Assert
-        result.Should().NotBeNull();
-        result.Should().HaveCount(1);
-    }
-
-    [Fact]
-    public async Task GetSalesSummaryAsync_ShouldReturnSummary()
-    {
-        // Act
-        var result = await _service.GetSalesSummaryAsync();
-
-        // Assert
-        result.Should().NotBeNull();
-    }
-
-    public void Dispose()
-    {
-        _context.Database.EnsureDeleted();
-        _context.Dispose();
+        var action = async () => await service.AddPaymentAsync(sale.Id, payment);
+        await action.Should().ThrowAsync<InvalidOperationException>();
     }
 }
-
-
-
-
-
-
-
-

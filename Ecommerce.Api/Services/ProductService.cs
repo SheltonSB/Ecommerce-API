@@ -1,3 +1,4 @@
+using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -13,11 +14,14 @@ public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
     private readonly ILogger<ProductService> _logger;
+    private readonly ICacheProvider _cache;
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
 
-    public ProductService(AppDbContext context, ILogger<ProductService> logger)
+    public ProductService(AppDbContext context, ILogger<ProductService> logger, ICacheProvider cache)
     {
         _context = context;
         _logger = logger;
+        _cache = cache;
     }
 
     /// <inheritdoc />
@@ -25,13 +29,22 @@ public class ProductService : IProductService
     {
         request.Validate();
 
+        var cacheKey = $"products:{request.Page}:{request.PageSize}:{categoryId}:{searchTerm}:{isActive}:{request.SortBy}:{request.SortDirection}";
+        var cached = await _cache.GetAsync<Paged<ProductListItemDto>>(cacheKey);
+        if (cached != null) return cached;
+
         var query = _context.Products
             .Include(p => p.Category)
             .AsQueryable();
 
         // Apply filters
         query = query.WhereIf(categoryId.HasValue, p => p.CategoryId == categoryId!.Value);
-        query = query.WhereIf(isActive.HasValue, p => p.IsActive == isActive!.Value);
+        if (isActive.HasValue)
+        {
+            query = isActive.Value 
+                ? query.Where(p => p.Status == ProductStatus.Active)
+                : query.Where(p => p.Status != ProductStatus.Active);
+        }
         query = query.SearchIn(searchTerm, p => p.Name, p => p.Description, p => p.Sku);
 
         // Apply sorting
@@ -50,12 +63,15 @@ public class ProductService : IProductService
                 Price = p.Price,
                 Sku = p.Sku,
                 StockQuantity = p.StockQuantity,
-                IsActive = p.IsActive,
-                CategoryName = p.Category.Name
+                IsActive = p.Status == ProductStatus.Active,
+                CategoryName = p.Category.Name,
+                ImageUrl = p.ImageUrl
             })
             .ToListAsync();
 
-        return new Paged<ProductListItemDto>(items, request.Page, request.PageSize, totalItems);
+        var result = new Paged<ProductListItemDto>(items, request.Page, request.PageSize, totalItems);
+        await _cache.SetAsync(cacheKey, result, CacheDuration, trackKey: true);
+        return result;
     }
 
     /// <inheritdoc />
@@ -76,7 +92,8 @@ public class ProductService : IProductService
             Price = product.Price,
             Sku = product.Sku,
             StockQuantity = product.StockQuantity,
-            IsActive = product.IsActive,
+            ImageUrl = product.ImageUrl,
+            IsActive = product.Status == ProductStatus.Active,
             Category = new CategoryListItemDto
             {
                 Id = product.Category.Id,
@@ -125,12 +142,32 @@ public class ProductService : IProductService
             Price = dto.Price,
             Sku = dto.Sku,
             StockQuantity = dto.StockQuantity,
-            IsActive = dto.IsActive,
+            ImageUrl = dto.ImageUrl,
+            // Map Enterprise Fields
+            Upc = dto.Upc,
+            Gtin = dto.Gtin,
+            Isbn = dto.Isbn,
+            KeyFeatures = dto.KeyFeatures,
+            InventoryLocation = dto.InventoryLocation,
+            Weight = dto.Weight,
+            Height = dto.Height,
+            Width = dto.Width,
+            Length = dto.Length,
+            IsHazmat = dto.IsHazmat,
+            SafetyDataSheetUrl = dto.SafetyDataSheetUrl,
+            FloorPrice = dto.FloorPrice,
+            CeilingPrice = dto.CeilingPrice,
+            Status = ProductStatus.Draft, // Start as Draft by default
             CategoryId = dto.CategoryId
         };
 
+        // Run automated checks
+        product.UpdateQualityScore();
+        product.RunComplianceCheck();
+
         _context.Products.Add(product);
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Created product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -175,11 +212,35 @@ public class ProductService : IProductService
         }
         product.Sku = dto.Sku;
         product.StockQuantity = dto.StockQuantity;
-        product.IsActive = dto.IsActive;
+        product.ImageUrl = dto.ImageUrl;
+        
+        // Map Enterprise Fields
+        product.Upc = dto.Upc;
+        product.Gtin = dto.Gtin;
+        product.Isbn = dto.Isbn;
+        product.KeyFeatures = dto.KeyFeatures;
+        product.InventoryLocation = dto.InventoryLocation;
+        product.Weight = dto.Weight;
+        product.Height = dto.Height;
+        product.Width = dto.Width;
+        product.Length = dto.Length;
+        product.IsHazmat = dto.IsHazmat;
+        product.SafetyDataSheetUrl = dto.SafetyDataSheetUrl;
+        product.FloorPrice = dto.FloorPrice;
+        product.CeilingPrice = dto.CeilingPrice;
+        
+        // If the user requested to activate, we try to set it, but ComplianceCheck might block it
+        if (dto.IsActive) product.Status = ProductStatus.Active;
+        
         product.CategoryId = dto.CategoryId;
         product.UpdateTimestamp();
 
+        // Run automated checks (might override Status to Blocked)
+        product.UpdateQualityScore();
+        product.RunComplianceCheck();
+
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Updated product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -197,6 +258,7 @@ public class ProductService : IProductService
 
         product.UpdateStock(dto.StockQuantity);
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Updated stock for product {ProductName} (ID: {ProductId}) to {StockQuantity}", product.Name, product.Id, dto.StockQuantity);
 
@@ -222,6 +284,7 @@ public class ProductService : IProductService
 
         product.MarkAsDeleted();
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Soft deleted product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -240,6 +303,7 @@ public class ProductService : IProductService
 
         product.Restore();
         await _context.SaveChangesAsync();
+        await InvalidateProductCache();
 
         _logger.LogInformation("Restored product {ProductName} with SKU {Sku} and ID {ProductId}", product.Name, product.Sku, product.Id);
 
@@ -277,12 +341,17 @@ public class ProductService : IProductService
         return await query.AnyAsync();
     }
 
+    private Task InvalidateProductCache()
+    {
+        return _cache.RemoveByPrefixAsync("products:");
+    }
+
     /// <inheritdoc />
     public async Task<IEnumerable<ProductListItemDto>> GetLowStockProductsAsync(int threshold = 10)
     {
         return await _context.Products
             .Include(p => p.Category)
-            .Where(p => p.StockQuantity <= threshold && p.IsActive)
+            .Where(p => p.StockQuantity <= threshold && p.Status == ProductStatus.Active)
             .Select(p => new ProductListItemDto
             {
                 Id = p.Id,
@@ -290,7 +359,7 @@ public class ProductService : IProductService
                 Price = p.Price,
                 Sku = p.Sku,
                 StockQuantity = p.StockQuantity,
-                IsActive = p.IsActive,
+                IsActive = p.Status == ProductStatus.Active,
                 CategoryName = p.Category.Name
             })
             .ToListAsync();
@@ -301,7 +370,7 @@ public class ProductService : IProductService
     {
         return await _context.Products
             .Include(p => p.Category)
-            .Where(p => p.CategoryId == categoryId && p.IsActive)
+            .Where(p => p.CategoryId == categoryId && p.Status == ProductStatus.Active)
             .Select(p => new ProductListItemDto
             {
                 Id = p.Id,
@@ -309,7 +378,7 @@ public class ProductService : IProductService
                 Price = p.Price,
                 Sku = p.Sku,
                 StockQuantity = p.StockQuantity,
-                IsActive = p.IsActive,
+                IsActive = p.Status == ProductStatus.Active,
                 CategoryName = p.Category.Name
             })
             .ToListAsync();

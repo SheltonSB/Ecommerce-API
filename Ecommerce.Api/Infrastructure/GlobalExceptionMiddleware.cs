@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace Ecommerce.Api.Infrastructure;
 
@@ -34,10 +35,8 @@ public class GlobalExceptionMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        var response = new ErrorResponse
-        {
-            TraceId = context.TraceIdentifier
-        };
+        var response = new ErrorResponse();
+        response.TraceId = Activity.Current?.Id ?? context.TraceIdentifier;
 
         switch (exception)
         {
@@ -58,10 +57,9 @@ public class GlobalExceptionMiddleware
                 response.Message = "Unauthorized access";
                 break;
 
-            case KeyNotFoundException notFoundEx:
+            case KeyNotFoundException:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 response.Message = "Resource not found";
-                response.Details = notFoundEx.Message;
                 break;
 
             case TimeoutException:

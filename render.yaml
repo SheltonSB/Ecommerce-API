@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: ecommerce-api
+    env: docker
+    region: oregon
+    dockerfilePath: Ecommerce.Api/Dockerfile
+    dockerContext: Ecommerce.Api
+    port: 8080
+    autoDeploy: true
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: FrontendURL
+        value: https://front-end-delta-orcin-43.vercel.app
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: Stripe__PublishableKey
+        sync: false
+      - key: Stripe__SecretKey
+        sync: false
+      - key: AdminUser__Password
+        sync: false

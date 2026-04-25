@@ -24,10 +24,12 @@ public static class Seed
             new Category { Name = "Beauty & Health", Description = "Beauty products and health supplements" }
         };
 
-        var existingCategoryNames = await context.Categories
+        var existingCategoryNames = new HashSet<string>(
+            await context.Categories
             .IgnoreQueryFilters()
             .Select(category => category.Name)
-            .ToHashSetAsync(StringComparer.OrdinalIgnoreCase);
+            .ToListAsync(),
+            StringComparer.OrdinalIgnoreCase);
 
         var categoriesToAdd = categorySeed
             .Where(category => !existingCategoryNames.Contains(category.Name))
@@ -191,10 +193,12 @@ public static class Seed
             }
         };
 
-        var existingSkus = await context.Products
+        var existingSkus = new HashSet<string>(
+            await context.Products
             .IgnoreQueryFilters()
             .Select(product => product.Sku)
-            .ToHashSetAsync(StringComparer.OrdinalIgnoreCase);
+            .ToListAsync(),
+            StringComparer.OrdinalIgnoreCase);
 
         var productsToAdd = productSeed
             .Where(product => !existingSkus.Contains(product.Sku))

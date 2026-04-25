@@ -67,6 +67,24 @@ public class Sale : Entity
     public string? CustomerEmail { get; set; }
 
     /// <summary>
+    /// Customer city for geospatial analysis
+    /// </summary>
+    [StringLength(100)]
+    public string? CustomerCity { get; set; }
+
+    /// <summary>
+    /// Customer state or province for geospatial analysis
+    /// </summary>
+    [StringLength(100)]
+    public string? CustomerState { get; set; }
+
+    /// <summary>
+    /// Customer country for geospatial analysis
+    /// </summary>
+    [StringLength(100)]
+    public string? CustomerCountry { get; set; }
+
+    /// <summary>
     /// Notes or comments about the sale
     /// </summary>
     [StringLength(500)]

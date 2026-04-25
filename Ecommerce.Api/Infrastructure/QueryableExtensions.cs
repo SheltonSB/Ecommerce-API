@@ -105,7 +105,7 @@ public static class QueryableExtensions
     /// </summary>
     /// <typeparam name="T">The type of items in the collection</typeparam>
     /// <param name="query">The queryable collection</param>
-    /// <param name="condition">Condition to check</param>
+    /// <param name="condition">The condition to evaluate</param>
     /// <param name="predicate">Filter condition</param>
     /// <returns>Filtered queryable</returns>
     public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate)
@@ -120,8 +120,8 @@ public static class QueryableExtensions
     /// <param name="query">The queryable collection</param>
     /// <param name="condition">Condition to check</param>
     /// <param name="predicate">Filter condition</param>
-    /// <param name="elsePredicate">Fallback filter when the condition is false</param>
-    /// <returns>Filtered queryable</returns>
+    /// <param name="elsePredicate">Filter condition to apply if the primary condition is false</param>
+    /// <returns>Filtered queryable</returns>    
     public static IQueryable<T> WhereIf<T>(this IQueryable<T> query, bool condition, Expression<Func<T, bool>> predicate, Expression<Func<T, bool>> elsePredicate)
     {
         return condition ? query.Where(predicate) : query.Where(elsePredicate);
@@ -140,16 +140,15 @@ public static class QueryableExtensions
         if (string.IsNullOrWhiteSpace(searchTerm) || !properties.Any())
             return query;
 
-        var normalizedSearchTerm = searchTerm.Trim();
         var parameter = Expression.Parameter(typeof(T), "x");
         Expression? combinedExpression = null;
 
         foreach (var property in properties)
         {
-            var propertyAccess = ReplaceParameter(property.Body, property.Parameters[0], parameter);
+            var propertyAccess = Expression.Invoke(property, parameter);
             var nullCheck = Expression.NotEqual(propertyAccess, Expression.Constant(null));
             var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-            var containsCall = Expression.Call(propertyAccess, containsMethod!, Expression.Constant(normalizedSearchTerm));
+            var containsCall = Expression.Call(propertyAccess, containsMethod!, Expression.Constant(searchTerm));
             var notNullAndContains = Expression.AndAlso(nullCheck, containsCall);
 
             combinedExpression = combinedExpression == null 
@@ -164,11 +163,6 @@ public static class QueryableExtensions
         }
 
         return query;
-    }
-
-    private static Expression ReplaceParameter(Expression expression, ParameterExpression source, ParameterExpression target)
-    {
-        return new ParameterReplacementVisitor(source, target).Visit(expression)!;
     }
 
     /// <summary>
@@ -195,22 +189,5 @@ public static class QueryableExtensions
         }
 
         return property;
-    }
-
-    private sealed class ParameterReplacementVisitor : ExpressionVisitor
-    {
-        private readonly ParameterExpression _source;
-        private readonly ParameterExpression _target;
-
-        public ParameterReplacementVisitor(ParameterExpression source, ParameterExpression target)
-        {
-            _source = source;
-            _target = target;
-        }
-
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            return node == _source ? _target : base.VisitParameter(node);
-        }
     }
 }

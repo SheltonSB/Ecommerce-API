@@ -1,0 +1,34 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+package "View" {
+  [Frontend UI\n(Vite/React or any HTTP client)] as FE
+}
+
+package "Controller" {
+  [ASP.NET Core Controllers\nAuth, Products, Categories, Sales, Checkout, Analytics, Admin] as C1
+}
+
+package "Model" {
+  [Services\nProduct, Category, Sale, Analytics, Email, Photo] as S1
+  [EF Core AppDbContext\nIdentity + Domain Entities] as D1
+}
+
+package "External Services" {
+  [Postgres DB] as DB
+  [Stripe Checkout] as Stripe
+  [Cloudinary] as Cloud
+  [SMTP Email] as SMTP
+  [Redis (prod) / Memory Cache] as Cache
+}
+
+FE --> C1
+C1 --> S1
+S1 --> D1
+D1 --> DB
+C1 --> Stripe
+S1 --> Cloud
+S1 --> SMTP
+S1 --> Cache
+@enduml

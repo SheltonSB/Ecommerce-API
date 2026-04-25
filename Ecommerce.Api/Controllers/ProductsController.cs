@@ -1,5 +1,6 @@
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Api.Controllers;
@@ -32,6 +33,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns the paginated list of products</response>
     [HttpGet]
     [ProducesResponseType(typeof(Paged<ProductListItemDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<Paged<ProductListItemDto>>> GetAll(
         [FromQuery] PagedRequest request,
         [FromQuery] int? categoryId = null,
@@ -52,6 +54,7 @@ public class ProductsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> GetById(int id)
     {
         var result = await _productService.GetByIdAsync(id);
@@ -72,6 +75,7 @@ public class ProductsController : ControllerBase
     [HttpGet("sku/{sku}")]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> GetBySku(string sku)
     {
         var result = await _productService.GetBySkuAsync(sku);
@@ -90,6 +94,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns low stock products</response>
     [HttpGet("low-stock")]
     [ProducesResponseType(typeof(IEnumerable<ProductListItemDto>), StatusCodes.Status200OK)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<ProductListItemDto>>> GetLowStock([FromQuery] int threshold = 10)
     {
         var result = await _productService.GetLowStockProductsAsync(threshold);
@@ -104,6 +109,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns products in the category</response>
     [HttpGet("category/{categoryId}")]
     [ProducesResponseType(typeof(IEnumerable<ProductListItemDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<ProductListItemDto>>> GetByCategory(int categoryId)
     {
         var result = await _productService.GetByCategoryAsync(categoryId);
@@ -118,6 +124,7 @@ public class ProductsController : ControllerBase
     /// <response code="200">Returns price history</response>
     [HttpGet("{id}/price-history")]
     [ProducesResponseType(typeof(IEnumerable<PriceHistoryDto>), StatusCodes.Status200OK)]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<PriceHistoryDto>>> GetPriceHistory(int id)
     {
         var result = await _productService.GetPriceHistoryAsync(id);
@@ -134,6 +141,7 @@ public class ProductsController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductDto>> Create([FromBody] CreateProductDto dto)
     {
         if (!ModelState.IsValid)
@@ -158,6 +166,7 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductDto>> Update(int id, [FromBody] UpdateProductDto dto)
     {
         if (!ModelState.IsValid)
@@ -182,6 +191,7 @@ public class ProductsController : ControllerBase
     [ProducesResponseType(typeof(ProductDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductDto>> UpdateStock(int id, [FromBody] UpdateStockDto dto)
     {
         if (!ModelState.IsValid)
@@ -203,6 +213,7 @@ public class ProductsController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         var result = await _productService.DeleteAsync(id);
@@ -223,6 +234,7 @@ public class ProductsController : ControllerBase
     [HttpPost("{id}/restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Restore(int id)
     {
         var result = await _productService.RestoreAsync(id);
@@ -233,4 +245,3 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 }
-

@@ -1,9 +1,11 @@
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
+using Ecommerce.Api.Infrastructure;
 using Ecommerce.Api.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -14,6 +16,7 @@ public class ProductServiceTests : IDisposable
     private readonly AppDbContext _context;
     private readonly ProductService _service;
     private readonly Mock<ILogger<ProductService>> _loggerMock;
+    private readonly MemoryCache _memoryCache;
 
     public ProductServiceTests()
     {
@@ -23,7 +26,8 @@ public class ProductServiceTests : IDisposable
 
         _context = new AppDbContext(options);
         _loggerMock = new Mock<ILogger<ProductService>>();
-        _service = new ProductService(_context, _loggerMock.Object);
+        _memoryCache = new MemoryCache(new MemoryCacheOptions());
+        _service = new ProductService(_context, _loggerMock.Object, new MemoryCacheProvider(_memoryCache));
 
         SeedTestData();
     }
@@ -43,7 +47,7 @@ public class ProductServiceTests : IDisposable
                 Price = 699.99m,
                 Sku = "PHONE-001",
                 StockQuantity = 50,
-                IsActive = true,
+                Status = ProductStatus.Active,
                 CategoryId = 1
             },
             new Product
@@ -54,7 +58,7 @@ public class ProductServiceTests : IDisposable
                 Price = 1299.99m,
                 Sku = "LAPTOP-001",
                 StockQuantity = 5,
-                IsActive = true,
+                Status = ProductStatus.Active,
                 CategoryId = 1
             },
             new Product
@@ -65,7 +69,7 @@ public class ProductServiceTests : IDisposable
                 Price = 499.99m,
                 Sku = "TABLET-001",
                 StockQuantity = 30,
-                IsActive = false,
+                Status = ProductStatus.Draft,
                 CategoryId = 1
             }
         };
@@ -340,6 +344,7 @@ public class ProductServiceTests : IDisposable
 
     public void Dispose()
     {
+        _memoryCache.Dispose();
         _context.Database.EnsureDeleted();
         _context.Dispose();
     }

@@ -1,0 +1,163 @@
+@startuml
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide methods
+hide fields
+
+package "Contracts" {
+class "Ecommerce.Api.Contracts.CreateProductWithImageDto" as Ecommerce.Api.Contracts.CreateProductWithImageDto
+class "Ecommerce.Api.Contracts.CreateSaleDto" as Ecommerce.Api.Contracts.CreateSaleDto
+class "Ecommerce.Api.Contracts.CreateSaleItemDto" as Ecommerce.Api.Contracts.CreateSaleItemDto
+class "Ecommerce.Api.Contracts.UpdateSaleDto" as Ecommerce.Api.Contracts.UpdateSaleDto
+class "Ecommerce.Api.Contracts.SaleDto" as Ecommerce.Api.Contracts.SaleDto
+class "Ecommerce.Api.Contracts.SaleListItemDto" as Ecommerce.Api.Contracts.SaleListItemDto
+class "Ecommerce.Api.Contracts.SaleItemDto" as Ecommerce.Api.Contracts.SaleItemDto
+class "Ecommerce.Api.Contracts.PaymentInfoDto" as Ecommerce.Api.Contracts.PaymentInfoDto
+class "Ecommerce.Api.Contracts.CreatePaymentInfoDto" as Ecommerce.Api.Contracts.CreatePaymentInfoDto
+class "Ecommerce.Api.Contracts.CreateCategoryDto" as Ecommerce.Api.Contracts.CreateCategoryDto
+class "Ecommerce.Api.Contracts.UpdateCategoryDto" as Ecommerce.Api.Contracts.UpdateCategoryDto
+class "Ecommerce.Api.Contracts.CategoryDto" as Ecommerce.Api.Contracts.CategoryDto
+class "Ecommerce.Api.Contracts.CategoryListItemDto" as Ecommerce.Api.Contracts.CategoryListItemDto
+class "Ecommerce.Api.Contracts.PagedRequest" as Ecommerce.Api.Contracts.PagedRequest
+class "Ecommerce.Api.Contracts.CreateProductDto" as Ecommerce.Api.Contracts.CreateProductDto
+class "Ecommerce.Api.Contracts.UpdateProductDto" as Ecommerce.Api.Contracts.UpdateProductDto
+class "Ecommerce.Api.Contracts.UpdateStockDto" as Ecommerce.Api.Contracts.UpdateStockDto
+class "Ecommerce.Api.Contracts.ProductDto" as Ecommerce.Api.Contracts.ProductDto
+class "Ecommerce.Api.Contracts.ProductListItemDto" as Ecommerce.Api.Contracts.ProductListItemDto
+class "Ecommerce.Api.Contracts.PriceHistoryDto" as Ecommerce.Api.Contracts.PriceHistoryDto
+}
+
+package "Controllers" {
+class "Ecommerce.Api.Controllers.CheckoutController" as Ecommerce.Api.Controllers.CheckoutController
+class "Ecommerce.Api.Controllers.CategoriesController" as Ecommerce.Api.Controllers.CategoriesController
+class "Ecommerce.Api.Controllers.ProductsController" as Ecommerce.Api.Controllers.ProductsController
+class "Ecommerce.Api.Controllers.SalesController" as Ecommerce.Api.Controllers.SalesController
+class "Ecommerce.Api.Controllers.AnalyticsController" as Ecommerce.Api.Controllers.AnalyticsController
+class "Ecommerce.Api.Controllers.AdminController" as Ecommerce.Api.Controllers.AdminController
+class "Ecommerce.Api.Controllers.AuthController" as Ecommerce.Api.Controllers.AuthController
+class "Ecommerce.Api.Controllers.RegisterUserDtoValidator" as Ecommerce.Api.Controllers.RegisterUserDtoValidator
+}
+
+package "Data" {
+class "Ecommerce.Api.Data.AppDbContext" as Ecommerce.Api.Data.AppDbContext
+class "Ecommerce.Api.Data.DataSeeder" as Ecommerce.Api.Data.DataSeeder
+class "Ecommerce.Api.Data.DesignTimeAppDbContextFactory" as Ecommerce.Api.Data.DesignTimeAppDbContextFactory
+class "Ecommerce.Api.Data.AdminSeeder" as Ecommerce.Api.Data.AdminSeeder
+class "Ecommerce.Api.Data.Seed" as Ecommerce.Api.Data.Seed
+}
+
+package "Domain" {
+class "Ecommerce.Api.Domain.SaleItem" as Ecommerce.Api.Domain.SaleItem
+class "Ecommerce.Api.Domain.UserInteraction" as Ecommerce.Api.Domain.UserInteraction
+class "Ecommerce.Api.Domain.Category" as Ecommerce.Api.Domain.Category
+class "Ecommerce.Api.Domain.Sale" as Ecommerce.Api.Domain.Sale
+class "Ecommerce.Api.Domain.PaymentInfo" as Ecommerce.Api.Domain.PaymentInfo
+class "Ecommerce.Api.Domain.PriceHistory" as Ecommerce.Api.Domain.PriceHistory
+class "Ecommerce.Api.Domain.ApplicationUser" as Ecommerce.Api.Domain.ApplicationUser
+class "Ecommerce.Api.Domain.Entity" as Ecommerce.Api.Domain.Entity
+class "Ecommerce.Api.Domain.Product" as Ecommerce.Api.Domain.Product
+}
+
+package "Infrastructure" {
+class "Ecommerce.Api.Infrastructure.AuditMiddleware" as Ecommerce.Api.Infrastructure.AuditMiddleware
+class "Ecommerce.Api.Infrastructure.ICacheProvider" as Ecommerce.Api.Infrastructure.ICacheProvider
+class "Ecommerce.Api.Infrastructure.DistributedCacheProvider" as Ecommerce.Api.Infrastructure.DistributedCacheProvider
+class "Ecommerce.Api.Infrastructure.QueryableExtensions" as Ecommerce.Api.Infrastructure.QueryableExtensions
+class "Ecommerce.Api.Infrastructure.MemoryCacheProvider" as Ecommerce.Api.Infrastructure.MemoryCacheProvider
+class "Ecommerce.Api.Infrastructure.GlobalExceptionMiddleware" as Ecommerce.Api.Infrastructure.GlobalExceptionMiddleware
+class "Ecommerce.Api.Infrastructure.ErrorResponse" as Ecommerce.Api.Infrastructure.ErrorResponse
+}
+
+package "Migrations" {
+class "Ecommerce.Api.Migrations.AddAnalytics" as Ecommerce.Api.Migrations.AddAnalytics
+class "Ecommerce.Api.Migrations.InitialPostgres" as Ecommerce.Api.Migrations.InitialPostgres
+class "Ecommerce.Api.Migrations.AddProductImageUrl" as Ecommerce.Api.Migrations.AddProductImageUrl
+class "Ecommerce.Api.Migrations.AppDbContextModelSnapshot" as Ecommerce.Api.Migrations.AppDbContextModelSnapshot
+class "Ecommerce.Api.Migrations.InitialPostgres" as Ecommerce.Api.Migrations.InitialPostgres
+class "Ecommerce.Api.Migrations.AddEnterpriseProductFields" as Ecommerce.Api.Migrations.AddEnterpriseProductFields
+class "Ecommerce.Api.Migrations.AddEnterpriseProductFields" as Ecommerce.Api.Migrations.AddEnterpriseProductFields
+class "Ecommerce.Api.Migrations.AddProductImageUrl" as Ecommerce.Api.Migrations.AddProductImageUrl
+class "Ecommerce.Api.Migrations.AddAnalytics" as Ecommerce.Api.Migrations.AddAnalytics
+}
+
+package "Root" {
+class "Ecommerce.Api.Program" as Ecommerce.Api.Program
+class "Ecommerce.Api.Middleware.GlobalExceptionHandlerMiddleware" as Ecommerce.Api.Middleware.GlobalExceptionHandlerMiddleware
+class "Ecommerce.Api.Controllers.Admin.AdminProductsController" as Ecommerce.Api.Controllers.Admin.AdminProductsController
+class "Ecommerce.Api.Controllers.Admin.DashboardController" as Ecommerce.Api.Controllers.Admin.DashboardController
+class "Ecommerce.Api.Controllers.Admin.AdminPhotosController" as Ecommerce.Api.Controllers.Admin.AdminPhotosController
+class "Ecommerce.Api.Controllers.Admin.DataSeedingController" as Ecommerce.Api.Controllers.Admin.DataSeedingController
+class "Ecommerce.Api.Controllers.Admin.AdminSalesController" as Ecommerce.Api.Controllers.Admin.AdminSalesController
+class "Ecommerce.Api.SecretsValidator" as Ecommerce.Api.SecretsValidator
+class "Ecommerce.Api.Controllers.Admin.AdminUsersController" as Ecommerce.Api.Controllers.Admin.AdminUsersController
+class "Ecommerce.Api.Mappings.MappingProfile" as Ecommerce.Api.Mappings.MappingProfile
+class "Program" as Program
+}
+
+package "Services" {
+class "Ecommerce.Api.Services.DummyEmailService" as Ecommerce.Api.Services.DummyEmailService
+class "Ecommerce.Api.Services.ProductService" as Ecommerce.Api.Services.ProductService
+class "Ecommerce.Api.Services.IEmailService" as Ecommerce.Api.Services.IEmailService
+class "Ecommerce.Api.Services.IPhotoService" as Ecommerce.Api.Services.IPhotoService
+class "Ecommerce.Api.Services.IEmailSender" as Ecommerce.Api.Services.IEmailSender
+class "Ecommerce.Api.Services.PhotoService" as Ecommerce.Api.Services.PhotoService
+class "Ecommerce.Api.Services.CategoryService" as Ecommerce.Api.Services.CategoryService
+class "Ecommerce.Api.Services.ISaleService" as Ecommerce.Api.Services.ISaleService
+class "Ecommerce.Api.Services.IProductService" as Ecommerce.Api.Services.IProductService
+class "Ecommerce.Api.Services.ICategoryService" as Ecommerce.Api.Services.ICategoryService
+class "Ecommerce.Api.Services.EmailSender" as Ecommerce.Api.Services.EmailSender
+class "Ecommerce.Api.Services.ImageService" as Ecommerce.Api.Services.ImageService
+class "Ecommerce.Api.Controllers.Admin.AiAgentController" as Ecommerce.Api.Controllers.Admin.AiAgentController
+class "Ecommerce.Api.Services.SaleService" as Ecommerce.Api.Services.SaleService
+class "Ecommerce.Api.Services.AnalyticsService" as Ecommerce.Api.Services.AnalyticsService
+class "Ecommerce.Api.Contracts.Analytics.AiTrendReportDto" as Ecommerce.Api.Contracts.Analytics.AiTrendReportDto
+class "Ecommerce.Api.Contracts.Analytics.SalesTrendPointDto" as Ecommerce.Api.Contracts.Analytics.SalesTrendPointDto
+class "Ecommerce.Api.Contracts.Analytics.ProductPerformanceDto" as Ecommerce.Api.Contracts.Analytics.ProductPerformanceDto
+class "Ecommerce.Api.Contracts.Analytics.CategoryPerformanceDto" as Ecommerce.Api.Contracts.Analytics.CategoryPerformanceDto
+class "Ecommerce.Api.Contracts.Analytics.GeospatialPerformanceDto" as Ecommerce.Api.Contracts.Analytics.GeospatialPerformanceDto
+class "Ecommerce.Api.Contracts.Analytics.SalesForecastDto" as Ecommerce.Api.Contracts.Analytics.SalesForecastDto
+class "Ecommerce.Api.Contracts.Analytics.StrategicRecommendationsDto" as Ecommerce.Api.Contracts.Analytics.StrategicRecommendationsDto
+class "Ecommerce.Api.Services.CloudinarySettings" as Ecommerce.Api.Services.CloudinarySettings
+class "Ecommerce.Api.Services.IAnalyticsService" as Ecommerce.Api.Services.IAnalyticsService
+}
+
+package "core" {
+class "Ecommerce.Api.Core.MappingProfile" as Ecommerce.Api.Core.MappingProfile
+}
+
+Ecommerce.Api.Infrastructure.DistributedCacheProvider ..|> Ecommerce.Api.Infrastructure.ICacheProvider
+Ecommerce.Api.Infrastructure.MemoryCacheProvider ..|> Ecommerce.Api.Infrastructure.ICacheProvider
+Ecommerce.Api.Domain.SaleItem --|> Ecommerce.Api.Domain.Entity
+Ecommerce.Api.Domain.Category --|> Ecommerce.Api.Domain.Entity
+Ecommerce.Api.Domain.Sale --|> Ecommerce.Api.Domain.Entity
+Ecommerce.Api.Domain.PaymentInfo --|> Ecommerce.Api.Domain.Entity
+Ecommerce.Api.Domain.PriceHistory --|> Ecommerce.Api.Domain.Entity
+Ecommerce.Api.Domain.Product --|> Ecommerce.Api.Domain.Entity
+Ecommerce.Api.Services.DummyEmailService ..|> Ecommerce.Api.Services.IEmailService
+Ecommerce.Api.Services.ProductService ..|> Ecommerce.Api.Services.IProductService
+Ecommerce.Api.Services.PhotoService ..|> Ecommerce.Api.Services.IPhotoService
+Ecommerce.Api.Services.CategoryService ..|> Ecommerce.Api.Services.ICategoryService
+Ecommerce.Api.Services.EmailSender ..|> Ecommerce.Api.Services.IEmailSender
+Ecommerce.Api.Services.EmailSender ..|> Ecommerce.Api.Services.IEmailService
+Ecommerce.Api.Services.SaleService ..|> Ecommerce.Api.Services.ISaleService
+Ecommerce.Api.Services.AnalyticsService ..|> Ecommerce.Api.Services.IAnalyticsService
+Ecommerce.Api.Controllers.Admin.AdminProductsController ..> Ecommerce.Api.Services.IProductService : uses
+Ecommerce.Api.Controllers.Admin.DashboardController ..> Ecommerce.Api.Services.ISaleService : uses
+Ecommerce.Api.Controllers.Admin.AdminPhotosController ..> Ecommerce.Api.Services.IPhotoService : uses
+Ecommerce.Api.Controllers.Admin.DataSeedingController ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Controllers.Admin.AdminSalesController ..> Ecommerce.Api.Services.ISaleService : uses
+Ecommerce.Api.Controllers.CheckoutController ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Controllers.CategoriesController ..> Ecommerce.Api.Services.ICategoryService : uses
+Ecommerce.Api.Controllers.ProductsController ..> Ecommerce.Api.Services.IProductService : uses
+Ecommerce.Api.Controllers.SalesController ..> Ecommerce.Api.Services.ISaleService : uses
+Ecommerce.Api.Controllers.AnalyticsController ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Controllers.AdminController ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Controllers.AdminController ..> Ecommerce.Api.Services.ImageService : uses
+Ecommerce.Api.Controllers.AuthController ..> Ecommerce.Api.Services.IEmailService : uses
+Ecommerce.Api.Services.ProductService ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Services.ProductService ..> Ecommerce.Api.Infrastructure.ICacheProvider : uses
+Ecommerce.Api.Services.CategoryService ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Controllers.Admin.AiAgentController ..> Ecommerce.Api.Services.IAnalyticsService : uses
+Ecommerce.Api.Services.SaleService ..> Ecommerce.Api.Data.AppDbContext : uses
+Ecommerce.Api.Services.AnalyticsService ..> Ecommerce.Api.Data.AppDbContext : uses
+@enduml

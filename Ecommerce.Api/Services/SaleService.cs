@@ -1,3 +1,5 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -12,11 +14,13 @@ namespace Ecommerce.Api.Services;
 public class SaleService : ISaleService
 {
     private readonly AppDbContext _context;
+    private readonly IMapper _mapper;
     private readonly ILogger<SaleService> _logger;
 
-    public SaleService(AppDbContext context, ILogger<SaleService> logger)
+    public SaleService(AppDbContext context, IMapper mapper, ILogger<SaleService> logger)
     {
         _context = context;
+        _mapper = mapper;
         _logger = logger;
     }
 
@@ -45,16 +49,7 @@ public class SaleService : ISaleService
         // Apply pagination
         var items = await query
             .Paginate(request.Page, request.PageSize)
-            .Select(s => new SaleListItemDto
-            {
-                Id = s.Id,
-                SaleNumber = s.SaleNumber,
-                SaleDate = s.SaleDate,
-                FinalAmount = s.FinalAmount,
-                Status = s.Status.ToString(),
-                CustomerName = s.CustomerName,
-                ItemCount = s.SaleItems.Count
-            })
+            .ProjectTo<SaleListItemDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
 
         return new Paged<SaleListItemDto>(items, request.Page, request.PageSize, totalItems);
@@ -73,50 +68,7 @@ public class SaleService : ISaleService
         if (sale == null)
             return null;
 
-        return new SaleDto
-        {
-            Id = sale.Id,
-            SaleNumber = sale.SaleNumber,
-            SaleDate = sale.SaleDate,
-            TotalAmount = sale.TotalAmount,
-            TaxAmount = sale.TaxAmount,
-            DiscountAmount = sale.DiscountAmount,
-            FinalAmount = sale.FinalAmount,
-            Status = sale.Status.ToString(),
-            CustomerName = sale.CustomerName,
-            CustomerEmail = sale.CustomerEmail,
-            Notes = sale.Notes,
-            SaleItems = sale.SaleItems.Select(si => new SaleItemDto
-            {
-                Id = si.Id,
-                Quantity = si.Quantity,
-                UnitPrice = si.UnitPrice,
-                TotalPrice = si.TotalPrice,
-                Product = new ProductListItemDto
-                {
-                    Id = si.Product.Id,
-                    Name = si.Product.Name,
-                    Price = si.Product.Price,
-                    Sku = si.Product.Sku,
-                    StockQuantity = si.Product.StockQuantity,
-                    IsActive = si.Product.IsActive,
-                    CategoryName = si.Product.Category.Name
-                }
-            }).ToList(),
-            PaymentInfo = sale.PaymentInfo != null ? new PaymentInfoDto
-            {
-                Id = sale.PaymentInfo.Id,
-                PaymentMethod = sale.PaymentInfo.PaymentMethod.ToString(),
-                Amount = sale.PaymentInfo.Amount,
-                Status = sale.PaymentInfo.Status.ToString(),
-                TransactionId = sale.PaymentInfo.TransactionId,
-                PaymentReference = sale.PaymentInfo.PaymentReference,
-                ProcessedAt = sale.PaymentInfo.ProcessedAt,
-                Notes = sale.PaymentInfo.Notes
-            } : null,
-            CreatedAt = sale.CreatedAt,
-            UpdatedAt = sale.UpdatedAt
-        };
+        return _mapper.Map<SaleDto>(sale);
     }
 
     /// <inheritdoc />
@@ -140,6 +92,11 @@ public class SaleService : ISaleService
             if (product == null)
             {
                 throw new KeyNotFoundException($"Product with ID {itemDto.ProductId} not found.");
+            }
+
+            if (product.StockQuantity < itemDto.Quantity)
+            {
+                throw new InvalidOperationException($"Out of stock: {product.Name}");
             }
 
             sale.AddSaleItem(product, itemDto.Quantity);
@@ -188,19 +145,11 @@ public class SaleService : ISaleService
         if (sale == null)
             return false;
 
-        try
-        {
-            sale.CompleteSale();
-            await _context.SaveChangesAsync();
+        sale.CompleteSale();
+        await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Completed sale {SaleNumber} with ID {SaleId}", sale.SaleNumber, sale.Id);
-            return true;
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning("Failed to complete sale {SaleId}: {Error}", id, ex.Message);
-            throw;
-        }
+        _logger.LogInformation("Completed sale {SaleNumber} with ID {SaleId}", sale.SaleNumber, sale.Id);
+        return true;
     }
 
     /// <inheritdoc />
@@ -210,19 +159,11 @@ public class SaleService : ISaleService
         if (sale == null)
             return false;
 
-        try
-        {
-            sale.CancelSale();
-            await _context.SaveChangesAsync();
+        sale.CancelSale();
+        await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Cancelled sale {SaleNumber} with ID {SaleId}", sale.SaleNumber, sale.Id);
-            return true;
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning("Failed to cancel sale {SaleId}: {Error}", id, ex.Message);
-            throw;
-        }
+        _logger.LogInformation("Cancelled sale {SaleNumber} with ID {SaleId}", sale.SaleNumber, sale.Id);
+        return true;
     }
 
     /// <inheritdoc />
@@ -268,16 +209,7 @@ public class SaleService : ISaleService
         return await _context.Sales
             .Include(s => s.SaleItems)
             .Where(s => s.SaleDate >= startDate && s.SaleDate <= endDate)
-            .Select(s => new SaleListItemDto
-            {
-                Id = s.Id,
-                SaleNumber = s.SaleNumber,
-                SaleDate = s.SaleDate,
-                FinalAmount = s.FinalAmount,
-                Status = s.Status.ToString(),
-                CustomerName = s.CustomerName,
-                ItemCount = s.SaleItems.Count
-            })
+            .ProjectTo<SaleListItemDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
 

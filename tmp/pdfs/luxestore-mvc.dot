@@ -1,0 +1,48 @@
+digraph MVC {
+  rankdir=LR;
+  graph [fontsize=12, fontname="Helvetica", splines=true, overlap=false];
+  node  [shape=box, style="rounded,filled", fillcolor="#F8FAFC", color="#2D3748", fontsize=11, fontname="Helvetica"];
+  edge  [color="#4A5568", fontsize=10, fontname="Helvetica"];
+
+  subgraph cluster_view {
+    label="View";
+    color="#CBD5E0";
+    style="rounded";
+    FE [label="Frontend UI\n(Vite/React or any HTTP client)"];
+  }
+
+  subgraph cluster_controller {
+    label="Controller";
+    color="#CBD5E0";
+    style="rounded";
+    C1 [label="ASP.NET Core Controllers\nAuth, Products, Categories, Sales, Checkout, Analytics, Admin"];
+  }
+
+  subgraph cluster_model {
+    label="Model";
+    color="#CBD5E0";
+    style="rounded";
+    S1 [label="Services\nProduct, Category, Sale, Analytics, Email, Photo"];
+    D1 [label="EF Core AppDbContext\nIdentity + Domain Entities"];
+  }
+
+  subgraph cluster_ext {
+    label="External Services";
+    color="#CBD5E0";
+    style="rounded";
+    DB [label="Postgres DB"];
+    Stripe [label="Stripe Checkout"];
+    Cloud [label="Cloudinary"];
+    SMTP [label="SMTP Email"];
+    Cache [label="Redis (prod) / Memory Cache"];
+  }
+
+  FE -> C1;
+  C1 -> S1;
+  S1 -> D1;
+  D1 -> DB;
+  C1 -> Stripe;
+  S1 -> Cloud;
+  S1 -> SMTP;
+  S1 -> Cache;
+}

@@ -1,74 +1,47 @@
-# Northstar Commerce
+# LuxeStore Commerce Platform
 
-Northstar Commerce is now a single-host .NET 9 application with:
+ASP.NET Core 9 e-commerce API with a React + Vite + TypeScript frontend in the same `Ecommerce.Api` folder.
 
-- A customer storefront at `/`
-- An admin console at `/admin`
-- Swagger/OpenAPI docs at `/docs`
-- REST endpoints under `/api/*`
-- A health endpoint at `/health`
+## Run Locally
 
-The API, client, and admin UI are deployed together from the same ASP.NET Core project, so there is no missing frontend build step anymore.
-
-## Stack
-
-- ASP.NET Core 9
-- Entity Framework Core 9
-- SQLite by default, SQL Server when `DatabaseProvider=SqlServer`
-- Serilog
-- xUnit, FluentAssertions, Moq
-
-## Local Run
-
+1. API
 ```bash
-dotnet restore
-dotnet run --project Ecommerce.Api
+cd Ecommerce.Api
+dotnet run --launch-profile https
 ```
 
-Open:
-
-- `http://localhost:5154/` for the storefront
-- `http://localhost:5154/admin` for the admin console
-- `http://localhost:5154/docs` for Swagger
-
-The app migrates the database on startup and seeds categories, products, sales, and price history idempotently.
-
-## Test And Publish
-
+2. Frontend
 ```bash
-dotnet build Ecommerce.sln
-dotnet test Ecommerce.sln
-dotnet publish Ecommerce.Api/Ecommerce.Api.csproj -c Release
+cd Ecommerce.Api
+npm install
+echo "VITE_API_URL=https://localhost:7154" > .env
+npm run dev
 ```
 
-## Docker
+Frontend default URL is `http://localhost:5173`.
 
-Build:
+## Required Configuration
 
-```bash
-docker build -t northstar-commerce .
-```
+Set these via `appsettings.*.json` or environment variables:
 
-Run:
+- `ConnectionStrings:DefaultConnection`
+- `Jwt:Key`, `Jwt:Issuer`, `Jwt:Audience`
+- `Stripe:SecretKey`, `Stripe:PublishableKey`
+- `AdminUser:Password`
+- `FrontendURL` (production frontend origin)
 
-```bash
-docker run --rm -p 8080:8080 northstar-commerce
-```
-
-The container defaults to SQLite with the database stored at `/app/data/Ecommerce.db`.
-
-## Configuration
-
-Defaults live in [Ecommerce.Api/appsettings.json](/C:/Users/shelt/OneDrive/Desktop/Ecommerce-API/Ecommerce.Api/appsettings.json:1).
-
-Useful overrides:
-
-- `DatabaseProvider=Sqlite`
-- `DatabaseProvider=SqlServer`
-- `ConnectionStrings__DefaultConnection=<your connection string>`
+Render env examples are in `render.yaml`.
 
 ## Notes
 
-- Product updates now support price changes and write price-history records.
-- The storefront checkout creates a sale, records payment, and completes the order through the API.
-- The admin console can create and update categories/products, inspect orders, add payment, and complete or cancel pending sales.
+- CORS allows configured frontend origins and localhost defaults in development.
+- Checkout uses Stripe Checkout Sessions and client-side Stripe.js redirect.
+- Admin endpoints require `Admin` role claims in JWT.
+
+## Build Checks
+
+```bash
+cd Ecommerce.Api
+dotnet build
+npm run build
+```

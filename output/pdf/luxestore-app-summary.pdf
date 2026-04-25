@@ -1,0 +1,156 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+6 0 obj
+<< /Length 2322 >>
+stream
+BT
+/F2 18 Tf
+1 0 0 1 54.00 738.00 Tm
+(LuxeStore Commerce Platform) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 714.00 Tm
+(App Summary \(1 page\)) Tj
+ET
+BT
+/F2 12 Tf
+1 0 0 1 54.00 696.00 Tm
+(WHAT IT IS) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 680.00 Tm
+(Modern e-commerce API built with ASP.NET Core 9, EF Core, and Identity/JWT auth.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 668.00 Tm
+(Provides product, category, sales, and analytics endpoints with production-ready plumbing.) Tj
+ET
+BT
+/F2 12 Tf
+1 0 0 1 54.00 650.00 Tm
+(WHO IT'S FOR) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 634.00 Tm
+(Not found in repo.) Tj
+ET
+BT
+/F2 12 Tf
+1 0 0 1 54.00 616.00 Tm
+(WHAT IT DOES) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 600.00 Tm
+(- Authentication with email verification \(ASP.NET Identity + JWT\).) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 588.00 Tm
+(- Product and category catalog APIs \(public reads\).) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 576.00 Tm
+(- Sales endpoints with checkout/complete flow \(Stripe-ready plumbing\).) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 564.00 Tm
+(- Product image uploads via Cloudinary integration.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 552.00 Tm
+(- Analytics tracking and export endpoints for user interactions.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 540.00 Tm
+(- Health checks, Serilog logging, and EF Core migrations/seeding.) Tj
+ET
+BT
+/F2 12 Tf
+1 0 0 1 54.00 522.00 Tm
+(HOW IT WORKS) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 506.00 Tm
+(- Client \(Vite/React frontend or any HTTP client\) calls the ASP.NET Core API.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 494.00 Tm
+(- API uses EF Core with Npgsql to access Postgres; Identity/JWT handles auth.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 482.00 Tm
+(- API integrates with Cloudinary \(images\), SMTP email \(verification\), and Stripe keys.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 470.00 Tm
+(- In-memory cache for product lists; /health for readiness; Serilog logs.) Tj
+ET
+BT
+/F2 12 Tf
+1 0 0 1 54.00 452.00 Tm
+(HOW TO RUN) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 436.00 Tm
+(- Set ConnectionStrings:DefaultConnection and Jwt settings in) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 66.00 424.00 Tm
+(appsettings.Development.json or env vars.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 412.00 Tm
+(- Run: cd Ecommerce.Api && dotnet run --launch-profile https.) Tj
+ET
+BT
+/F1 10 Tf
+1 0 0 1 54.00 400.00 Tm
+(- Optional: docker compose up --build \(API + Postgres on 8080/5432\).) Tj
+ET
+
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000000321 00000 n 
+0000000396 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+2770
+%%EOF

@@ -1,4 +1,3 @@
-using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -13,13 +12,11 @@ namespace Ecommerce.Api.Services;
 public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
     private readonly ILogger<ProductService> _logger;
 
-    public ProductService(AppDbContext context, IMapper mapper, ILogger<ProductService> logger)
+    public ProductService(AppDbContext context, ILogger<ProductService> logger)
     {
         _context = context;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -164,6 +161,18 @@ public class ProductService : IProductService
 
         product.Name = dto.Name;
         product.Description = dto.Description;
+        if (product.Price != dto.Price)
+        {
+            _context.PriceHistories.Add(new PriceHistory
+            {
+                ProductId = product.Id,
+                OldPrice = product.Price,
+                NewPrice = dto.Price,
+                ChangedAt = DateTime.UtcNow
+            });
+
+            product.Price = dto.Price;
+        }
         product.Sku = dto.Sku;
         product.StockQuantity = dto.StockQuantity;
         product.IsActive = dto.IsActive;

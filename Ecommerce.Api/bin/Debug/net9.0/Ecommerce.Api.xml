@@ -234,6 +234,11 @@
             Description of the product
             </summary>
         </member>
+        <member name="P:Ecommerce.Api.Contracts.UpdateProductDto.Price">
+            <summary>
+            Updated price of the product
+            </summary>
+        </member>
         <member name="P:Ecommerce.Api.Contracts.UpdateProductDto.Sku">
             <summary>
             SKU (Stock Keeping Unit) of the product
@@ -1555,6 +1560,7 @@
             </summary>
             <typeparam name="T">The type of items in the collection</typeparam>
             <param name="query">The queryable collection</param>
+            <param name="condition">Condition to check</param>
             <param name="predicate">Filter condition</param>
             <returns>Filtered queryable</returns>
         </member>
@@ -1566,6 +1572,7 @@
             <param name="query">The queryable collection</param>
             <param name="condition">Condition to check</param>
             <param name="predicate">Filter condition</param>
+            <param name="elsePredicate">Fallback filter when the condition is false</param>
             <returns>Filtered queryable</returns>
         </member>
         <member name="M:Ecommerce.Api.Infrastructure.QueryableExtensions.SearchIn``1(System.Linq.IQueryable{``0},System.String,System.Linq.Expressions.Expression{System.Func{``0,System.String}}[])">

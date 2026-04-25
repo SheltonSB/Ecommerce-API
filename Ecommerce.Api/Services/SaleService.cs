@@ -1,4 +1,3 @@
-using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -13,13 +12,11 @@ namespace Ecommerce.Api.Services;
 public class SaleService : ISaleService
 {
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
     private readonly ILogger<SaleService> _logger;
 
-    public SaleService(AppDbContext context, IMapper mapper, ILogger<SaleService> logger)
+    public SaleService(AppDbContext context, ILogger<SaleService> logger)
     {
         _context = context;
-        _mapper = mapper;
         _logger = logger;
     }
 
@@ -28,13 +25,16 @@ public class SaleService : ISaleService
     {
         request.Validate();
 
+        var normalizedStatus = ParseStatus(status);
+        var normalizedCustomerName = string.IsNullOrWhiteSpace(customerName) ? null : customerName.Trim();
+
         var query = _context.Sales
             .Include(s => s.SaleItems)
             .AsQueryable();
 
         // Apply filters
-        query = query.WhereIf(!string.IsNullOrWhiteSpace(status), s => s.Status.ToString() == status);
-        query = query.WhereIf(!string.IsNullOrWhiteSpace(customerName), s => s.CustomerName != null && s.CustomerName.Contains(customerName));
+        query = query.WhereIf(normalizedStatus.HasValue, s => s.Status == normalizedStatus!.Value);
+        query = query.WhereIf(normalizedCustomerName != null, s => s.CustomerName != null && s.CustomerName.Contains(normalizedCustomerName!));
 
         // Apply sorting
         query = query.SortBy(request.SortBy, request.SortDirection);
@@ -66,6 +66,7 @@ public class SaleService : ISaleService
         var sale = await _context.Sales
             .Include(s => s.SaleItems)
                 .ThenInclude(si => si.Product)
+                    .ThenInclude(p => p.Category)
             .Include(s => s.PaymentInfo)
             .FirstOrDefaultAsync(s => s.Id == id);
 
@@ -123,7 +124,7 @@ public class SaleService : ISaleService
     {
         var sale = new Sale
         {
-            SaleNumber = $"SALE-{DateTime.UtcNow:yyyyMMdd-HHmmss}",
+            SaleNumber = GenerateSaleNumber(),
             CustomerName = dto.CustomerName,
             CustomerEmail = dto.CustomerEmail,
             TaxAmount = dto.TaxAmount,
@@ -181,6 +182,7 @@ public class SaleService : ISaleService
     {
         var sale = await _context.Sales
             .Include(s => s.SaleItems)
+                .ThenInclude(si => si.Product)
             .FirstOrDefaultAsync(s => s.Id == id);
 
         if (sale == null)
@@ -226,19 +228,32 @@ public class SaleService : ISaleService
     /// <inheritdoc />
     public async Task<bool> AddPaymentAsync(int saleId, CreatePaymentInfoDto dto)
     {
-        var sale = await _context.Sales.FindAsync(saleId);
+        var sale = await _context.Sales
+            .Include(s => s.PaymentInfo)
+            .FirstOrDefaultAsync(s => s.Id == saleId);
         if (sale == null)
             return false;
+
+        if (sale.PaymentInfo != null)
+        {
+            throw new InvalidOperationException("A payment has already been recorded for this sale.");
+        }
+
+        if (!Enum.TryParse<PaymentMethod>(dto.PaymentMethod, true, out var paymentMethod))
+        {
+            throw new ArgumentException($"Unsupported payment method '{dto.PaymentMethod}'.", nameof(dto.PaymentMethod));
+        }
 
         var paymentInfo = new PaymentInfo
         {
             SaleId = saleId,
-            PaymentMethod = Enum.Parse<PaymentMethod>(dto.PaymentMethod),
+            PaymentMethod = paymentMethod,
             Amount = dto.Amount,
             PaymentReference = dto.PaymentReference,
             Notes = dto.Notes,
             Status = PaymentStatus.Pending
         };
+        paymentInfo.MarkAsProcessed();
 
         _context.PaymentInfos.Add(paymentInfo);
         await _context.SaveChangesAsync();
@@ -280,7 +295,7 @@ public class SaleService : ISaleService
             .ToListAsync();
 
         var totalSales = await _context.Sales.CountAsync();
-        var totalRevenue = await _context.Sales.SumAsync(s => s.FinalAmount);
+        var totalRevenue = await _context.Sales.SumAsync(s => (decimal?)s.FinalAmount) ?? 0m;
 
         return new
         {
@@ -288,5 +303,22 @@ public class SaleService : ISaleService
             TotalRevenue = totalRevenue,
             StatusBreakdown = summary
         };
+    }
+
+    private static SaleStatus? ParseStatus(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return null;
+        }
+
+        return Enum.TryParse<SaleStatus>(status.Trim(), true, out var parsedStatus)
+            ? parsedStatus
+            : throw new ArgumentException($"Unsupported sale status '{status}'.", nameof(status));
+    }
+
+    private static string GenerateSaleNumber()
+    {
+        return $"SALE-{DateTime.UtcNow:yyyyMMdd-HHmmssfff}-{Random.Shared.Next(100, 999)}";
     }
 }

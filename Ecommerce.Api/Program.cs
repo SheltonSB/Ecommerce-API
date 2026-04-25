@@ -1,6 +1,7 @@
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Infrastructure;
 using Ecommerce.Api.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -22,16 +23,18 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 
 // Database Configuration
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");
+var databaseProvider = builder.Configuration["DatabaseProvider"];
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    if (builder.Environment.IsDevelopment())
+    if (string.Equals(databaseProvider, "SqlServer", StringComparison.OrdinalIgnoreCase))
     {
-        options.UseSqlite(connectionString);
+        options.UseSqlServer(connectionString);
     }
     else
     {
-        options.UseSqlServer(connectionString);
+        options.UseSqlite(connectionString);
     }
     options.EnableSensitiveDataLogging(builder.Environment.IsDevelopment());
 });
@@ -40,9 +43,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
-
-// Add AutoMapper
-builder.Services.AddAutoMapper(typeof(Program));
 
 // Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -86,17 +86,27 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-commerce API v1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at app's root
-    });
+    app.UseHsts();
 }
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+app.UseSerilogRequestLogging();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "E-commerce API v1");
+    c.RoutePrefix = "docs";
+});
+
 app.UseHttpsRedirection();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseCors("AllowAll");
 
@@ -111,6 +121,8 @@ app.MapControllers();
 
 // Health Check endpoint
 app.MapHealthChecks("/health");
+app.MapFallbackToFile("/admin/{*path:nonfile}", "admin/index.html");
+app.MapFallbackToFile("/{*path:nonfile}", "index.html");
 
 // Database Migration and Seeding
 using (var scope = app.Services.CreateScope())

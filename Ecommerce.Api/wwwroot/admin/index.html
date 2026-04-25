@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Northstar Commerce Admin</title>
+    <meta name="description" content="Admin console for the Northstar Commerce demo API.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body class="admin-page">
+    <div class="shell">
+        <header class="glass hero">
+            <div class="nav-row">
+                <div class="brand-lockup">
+                    <span class="brand-badge">A</span>
+                    <span>Northstar Admin</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="/">Storefront</a>
+                    <a href="/docs">API Docs</a>
+                    <button id="refresh-admin" type="button">Refresh data</button>
+                </nav>
+            </div>
+
+            <div class="hero-copy">
+                <div class="stack">
+                    <span class="eyebrow">Single-host operations console</span>
+                    <h1>Inventory, categories, and orders from the same API.</h1>
+                </div>
+                <p>
+                    The admin page is hosted directly by the ASP.NET app and exercises the same category, product,
+                    sales, and payment endpoints that external clients would use.
+                </p>
+            </div>
+
+            <div id="summary-grid" class="stats-grid"></div>
+        </header>
+
+        <main class="admin-layout">
+            <section class="admin-main">
+                <section class="form-grid">
+                    <article class="glass form-card">
+                        <div class="panel-head">
+                            <div>
+                                <h3 class="section-title">Category Editor</h3>
+                                <div class="hint">Create or update product groupings.</div>
+                            </div>
+                            <button id="reset-category-form" class="button-ghost" type="button">Clear</button>
+                        </div>
+
+                        <form id="category-form" class="stack">
+                            <input id="category-id" type="hidden">
+                            <div class="field">
+                                <label for="category-name">Category name</label>
+                                <input id="category-name" type="text" required maxlength="100">
+                            </div>
+                            <div class="field">
+                                <label for="category-description">Description</label>
+                                <textarea id="category-description" maxlength="500"></textarea>
+                            </div>
+                            <button id="category-submit" class="button" type="submit">Save category</button>
+                        </form>
+                    </article>
+
+                    <article class="glass form-card">
+                        <div class="panel-head">
+                            <div>
+                                <h3 class="section-title">Product Editor</h3>
+                                <div class="hint">Price, stock, category, and activation state are all live.</div>
+                            </div>
+                            <button id="reset-product-form" class="button-ghost" type="button">Clear</button>
+                        </div>
+
+                        <form id="product-form" class="stack">
+                            <input id="product-id" type="hidden">
+                            <div class="field">
+                                <label for="product-name">Product name</label>
+                                <input id="product-name" type="text" required maxlength="200">
+                            </div>
+                            <div class="field">
+                                <label for="product-description">Description</label>
+                                <textarea id="product-description" maxlength="1000"></textarea>
+                            </div>
+                            <div class="form-grid">
+                                <div class="field">
+                                    <label for="product-price">Price</label>
+                                    <input id="product-price" type="number" min="0.01" step="0.01" required>
+                                </div>
+                                <div class="field">
+                                    <label for="product-sku">SKU</label>
+                                    <input id="product-sku" type="text" required maxlength="50">
+                                </div>
+                                <div class="field">
+                                    <label for="product-stock">Stock</label>
+                                    <input id="product-stock" type="number" min="0" step="1" required>
+                                </div>
+                                <div class="field">
+                                    <label for="product-category">Category</label>
+                                    <select id="product-category" required></select>
+                                </div>
+                            </div>
+                            <label class="toggle-row">
+                                <input id="product-active" type="checkbox" checked>
+                                <span>Active and visible in the storefront</span>
+                            </label>
+                            <button id="product-submit" class="button" type="submit">Save product</button>
+                        </form>
+                    </article>
+                </section>
+
+                <section class="glass table-card">
+                    <div class="panel-head">
+                        <div>
+                            <h3 class="section-title">Inventory</h3>
+                            <div class="hint">Edit or archive products that are already in the catalog.</div>
+                        </div>
+                        <div class="toolbar">
+                            <div class="field">
+                                <label for="product-search">Search</label>
+                                <input id="product-search" type="search" placeholder="Filter products">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="product-table" class="data-table"></div>
+                </section>
+
+                <section class="glass table-card">
+                    <div class="panel-head">
+                        <div>
+                            <h3 class="section-title">Orders</h3>
+                            <div class="hint">Select an order to inspect items, add payment, or change status.</div>
+                        </div>
+                        <div class="toolbar">
+                            <div class="field">
+                                <label for="sales-status">Status</label>
+                                <select id="sales-status">
+                                    <option value="">All statuses</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="Refunded">Refunded</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="sales-search">Customer</label>
+                                <input id="sales-search" type="search" placeholder="Filter by customer">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sales-table" class="data-table"></div>
+                </section>
+            </section>
+
+            <aside class="admin-side">
+                <section class="glass side-card">
+                    <h3 class="section-title">Categories</h3>
+                    <div id="category-list"></div>
+                </section>
+
+                <section class="glass side-card">
+                    <h3 class="section-title">Low Stock</h3>
+                    <div id="low-stock-list"></div>
+                </section>
+
+                <section class="glass side-card">
+                    <h3 class="section-title">Order Detail</h3>
+                    <div id="sale-detail"></div>
+                </section>
+            </aside>
+        </main>
+    </div>
+
+    <script type="module" src="/assets/admin.js"></script>
+</body>
+</html>

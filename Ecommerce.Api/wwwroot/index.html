@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Northstar Commerce</title>
+    <meta name="description" content="Customer storefront for the Northstar Commerce demo API.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+    <div class="shell">
+        <header class="glass hero">
+            <div class="nav-row">
+                <div class="brand-lockup">
+                    <span class="brand-badge">N</span>
+                    <span>Northstar Commerce</span>
+                </div>
+                <nav class="nav-links">
+                    <a href="/admin">Admin Console</a>
+                    <a href="/docs">API Docs</a>
+                    <a href="#checkout">Checkout</a>
+                </nav>
+            </div>
+
+            <div class="hero-copy">
+                <div class="stack">
+                    <span class="eyebrow">Live storefront wired to the API</span>
+                    <h1>Catalog, cart, and checkout on one deploy.</h1>
+                </div>
+                <p>
+                    This client reads the live categories and products from the ASP.NET API, builds a cart in the browser,
+                    and creates real sales records through the existing order endpoints.
+                </p>
+            </div>
+
+            <div id="storefront-stats" class="hero-stats"></div>
+            <div id="category-chips" class="chip-row"></div>
+        </header>
+
+        <main class="catalog-layout">
+            <section class="catalog-stack">
+                <section class="glass controls-card">
+                    <div class="panel-head">
+                        <div>
+                            <h2 class="panel-title">Browse Products</h2>
+                            <div class="hint">Search and filter against the live API.</div>
+                        </div>
+                        <button id="refresh-products" class="button-ghost" type="button">Refresh</button>
+                    </div>
+
+                    <div class="control-grid">
+                        <div class="field">
+                            <label for="search-input">Search</label>
+                            <input id="search-input" type="search" placeholder="Try phone, book, skincare...">
+                        </div>
+                        <div class="field">
+                            <label for="category-filter">Category</label>
+                            <select id="category-filter">
+                                <option value="">All categories</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="sort-filter">Sort</label>
+                            <select id="sort-filter">
+                                <option value="Name|asc">Name: A to Z</option>
+                                <option value="Price|asc">Price: Low to High</option>
+                                <option value="Price|desc">Price: High to Low</option>
+                                <option value="StockQuantity|asc">Stock: Low to High</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="product-grid" class="product-grid"></section>
+            </section>
+
+            <aside class="glass cart-panel" id="checkout">
+                <div class="panel-head">
+                    <div>
+                        <h2 class="panel-title">Checkout</h2>
+                        <div class="hint">Submitting this form creates a sale, records payment, and completes the order.</div>
+                    </div>
+                </div>
+
+                <div id="checkout-status" class="checkout-status"></div>
+                <div id="cart-items" class="cart-items"></div>
+
+                <form id="checkout-form" class="stack">
+                    <div class="field">
+                        <label for="customer-name">Customer name</label>
+                        <input id="customer-name" name="customerName" type="text" required placeholder="Jamie Carter">
+                    </div>
+                    <div class="field">
+                        <label for="customer-email">Customer email</label>
+                        <input id="customer-email" name="customerEmail" type="email" placeholder="jamie@example.com">
+                    </div>
+                    <div class="field">
+                        <label for="payment-method">Payment method</label>
+                        <select id="payment-method" name="paymentMethod" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="order-notes">Notes</label>
+                        <textarea id="order-notes" name="notes" placeholder="Delivery notes, order context, or internal comment."></textarea>
+                    </div>
+                    <button id="checkout-button" class="button" type="submit">Place order</button>
+                </form>
+            </aside>
+        </main>
+    </div>
+
+    <script type="module" src="/assets/client.js"></script>
+</body>
+</html>

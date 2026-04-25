@@ -34,7 +34,10 @@ public class GlobalExceptionMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        var response = new ErrorResponse();
+        var response = new ErrorResponse
+        {
+            TraceId = context.TraceIdentifier
+        };
 
         switch (exception)
         {
@@ -55,9 +58,10 @@ public class GlobalExceptionMiddleware
                 response.Message = "Unauthorized access";
                 break;
 
-            case KeyNotFoundException:
+            case KeyNotFoundException notFoundEx:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 response.Message = "Resource not found";
+                response.Details = notFoundEx.Message;
                 break;
 
             case TimeoutException:

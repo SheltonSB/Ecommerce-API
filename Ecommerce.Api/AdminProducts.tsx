@@ -56,7 +56,7 @@ const getProducts = async () => {
  * @throws {Error} If the API response is not ok.
  */
 const createProduct = async (productData: ProductFormValues) => {
-  const response = await fetch(`${apiBaseUrl}/api/products`, {
+  const response = await fetch(`${apiBaseUrl}/api/admin/products`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

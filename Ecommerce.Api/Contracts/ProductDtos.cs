@@ -59,6 +59,12 @@ public class CreateProductDto
     public int StockQuantity { get; set; } = 0;
 
     /// <summary>
+    /// Public image URL for the product
+    /// </summary>
+    [Url(ErrorMessage = "Image URL must be a valid URL")]
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
     /// Key features or bullet points for the product description
     /// </summary>
     public string? KeyFeatures { get; set; }
@@ -147,6 +153,13 @@ public class UpdateProductDto
     public string? Description { get; set; }
 
     /// <summary>
+    /// Updated price of the product
+    /// </summary>
+    [Required(ErrorMessage = "Price is required")]
+    [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+    public decimal Price { get; set; }
+
+    /// <summary>
     /// SKU (Stock Keeping Unit) of the product
     /// </summary>
     [Required(ErrorMessage = "SKU is required")]
@@ -176,6 +189,12 @@ public class UpdateProductDto
     /// </summary>
     [Range(0, int.MaxValue, ErrorMessage = "Stock quantity cannot be negative")]
     public int StockQuantity { get; set; }
+
+    /// <summary>
+    /// Public image URL for the product
+    /// </summary>
+    [Url(ErrorMessage = "Image URL must be a valid URL")]
+    public string? ImageUrl { get; set; }
 
     /// <summary>
     /// Key features or bullet points for the product description

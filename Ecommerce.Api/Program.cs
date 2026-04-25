@@ -21,6 +21,8 @@ using OpenTelemetry.Trace;
 using OpenTelemetry.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
+var isTesting = builder.Environment.IsEnvironment("Testing");
+var isLocalEnvironment = builder.Environment.IsDevelopment() || isTesting;
 
 // 1. Database (Neon Postgres)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -28,7 +30,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // Validate critical secrets early (prod only)
-if (!builder.Environment.IsDevelopment())
+if (!isLocalEnvironment)
 {
     SecretsValidator.Validate(builder.Configuration);
 }
@@ -54,7 +56,7 @@ builder.Services.AddAuthentication(options =>
 .AddJwtBearer(options =>
 {
     // In production, this should be true.
-    options.RequireHttpsMetadata = builder.Environment.IsDevelopment() ? false : true;
+    options.RequireHttpsMetadata = isLocalEnvironment ? false : true;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -102,8 +104,12 @@ builder.Services.AddCors(options =>
     AddOriginIfValid(frontendURL);
     AddOriginIfValid(vercelUrl);
 
-    if (builder.Environment.IsDevelopment())
+    if (isLocalEnvironment)
     {
+        AddOriginIfValid("http://localhost");
+        AddOriginIfValid("https://localhost");
+        AddOriginIfValid("http://127.0.0.1");
+        AddOriginIfValid("https://127.0.0.1");
         AddOriginIfValid("http://localhost:5173");
         AddOriginIfValid("https://localhost:5173");
         AddOriginIfValid("http://127.0.0.1:5173");
@@ -115,7 +121,13 @@ builder.Services.AddCors(options =>
 
     if (allowedOrigins.Count == 0)
     {
-        throw new InvalidOperationException("No valid CORS frontend origins configured.");
+        if (!isLocalEnvironment)
+        {
+            throw new InvalidOperationException("No valid CORS frontend origins configured.");
+        }
+
+        AddOriginIfValid("http://localhost");
+        AddOriginIfValid("https://localhost");
     }
 
     Console.WriteLine($"[CORS] Configured Allowed Origins: {string.Join(", ", allowedOrigins)}");
@@ -171,7 +183,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 // Use real email sender in non-development; fall back to dummy for local dev
-if (builder.Environment.IsDevelopment())
+if (isLocalEnvironment)
 {
     builder.Services.AddScoped<IEmailService, DummyEmailService>();
 }

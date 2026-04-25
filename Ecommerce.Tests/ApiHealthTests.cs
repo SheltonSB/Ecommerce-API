@@ -1,14 +1,13 @@
 using System.Net;
 using Ecommerce.Api;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Ecommerce.Tests;
 
-public class ApiHealthTests : IClassFixture<WebApplicationFactory<Program>>
+public class ApiHealthTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public ApiHealthTests(WebApplicationFactory<Program> factory)
+    public ApiHealthTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

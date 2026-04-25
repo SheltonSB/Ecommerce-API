@@ -4,7 +4,6 @@ using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
 using Ecommerce.Api.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Ecommerce.Api.Services;
 
@@ -14,15 +13,13 @@ namespace Ecommerce.Api.Services;
 public class ProductService : IProductService
 {
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
     private readonly ILogger<ProductService> _logger;
     private readonly ICacheProvider _cache;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
 
-    public ProductService(AppDbContext context, IMapper mapper, ILogger<ProductService> logger, ICacheProvider cache)
+    public ProductService(AppDbContext context, ILogger<ProductService> logger, ICacheProvider cache)
     {
         _context = context;
-        _mapper = mapper;
         _logger = logger;
         _cache = cache;
     }
@@ -145,6 +142,7 @@ public class ProductService : IProductService
             Price = dto.Price,
             Sku = dto.Sku,
             StockQuantity = dto.StockQuantity,
+            ImageUrl = dto.ImageUrl,
             // Map Enterprise Fields
             Upc = dto.Upc,
             Gtin = dto.Gtin,
@@ -200,8 +198,21 @@ public class ProductService : IProductService
 
         product.Name = dto.Name;
         product.Description = dto.Description;
+        if (product.Price != dto.Price)
+        {
+            _context.PriceHistories.Add(new PriceHistory
+            {
+                ProductId = product.Id,
+                OldPrice = product.Price,
+                NewPrice = dto.Price,
+                ChangedAt = DateTime.UtcNow
+            });
+
+            product.Price = dto.Price;
+        }
         product.Sku = dto.Sku;
         product.StockQuantity = dto.StockQuantity;
+        product.ImageUrl = dto.ImageUrl;
         
         // Map Enterprise Fields
         product.Upc = dto.Upc;

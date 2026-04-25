@@ -1,0 +1,10 @@
+.git
+.github
+**/bin
+**/obj
+**/.vs
+**/*.user
+**/*.suo
+**/*.db-shm
+**/*.db-wal
+Ecommerce.Api/Ecommerce.db

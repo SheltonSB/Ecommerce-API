@@ -4,11 +4,11 @@ using System.Net;
 
 namespace Ecommerce.Api.Validators;
 
-public class EmailDomainValidator<T> : AsyncPropertyValidator<T, string>
+public class EmailDomainValidator<T> : PropertyValidator<T, string>
 {
     public override string Name => "EmailDomainValidator";
 
-    public override async Task<bool> IsValidAsync(ValidationContext<T> context, string value, CancellationToken cancellationToken)
+    public override bool IsValid(ValidationContext<T> context, string value)
     {
         if (string.IsNullOrWhiteSpace(value) || !value.Contains('@'))
         {
@@ -18,7 +18,7 @@ public class EmailDomainValidator<T> : AsyncPropertyValidator<T, string>
         var domain = value.Split('@').Last();
         try
         {
-            var hostEntry = await Dns.GetHostEntryAsync(domain);
+            var hostEntry = Dns.GetHostEntry(domain);
             // A simple check for any address. A more robust check might look for MX records specifically.
             return hostEntry.AddressList.Any();
         }

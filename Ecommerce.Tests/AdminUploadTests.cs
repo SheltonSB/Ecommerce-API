@@ -1,10 +1,8 @@
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ecommerce.Tests;
@@ -23,36 +21,12 @@ public class AdminUploadTests : IClassFixture<CustomWebApplicationFactory>
     {
         var client = _factory.CreateClient();
 
-        // Seed admin
-        using (var scope = _factory.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            const string role = "Admin";
-            const string email = "admin@test.com";
-            const string password = "Test123!";
-            if (!await roleManager.RoleExistsAsync(role))
-            {
-                await roleManager.CreateAsync(new IdentityRole(role));
-            }
-            var admin = await userManager.FindByEmailAsync(email);
-            if (admin == null)
-            {
-                admin = new ApplicationUser { UserName = email, Email = email, EmailConfirmed = true };
-                await userManager.CreateAsync(admin, password);
-            }
-            if (!await userManager.IsInRoleAsync(admin, role))
-            {
-                await userManager.AddToRoleAsync(admin, role);
-            }
-        }
-
         // login to get token
-        var login = await client.PostAsJsonAsync("/api/auth/login", new LoginDto("admin@test.com", "Test123!"));
+        var login = await client.PostAsJsonAsync("/api/auth/login", new LoginDto("admin@ecommerce.com", "ChangeMe_AdminPassword1!"));
         login.EnsureSuccessStatusCode();
         var token = (await login.Content.ReadFromJsonAsync<AuthResponseDto>())?.Token;
         Assert.False(string.IsNullOrWhiteSpace(token));
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
         // create category to reference
         using (var scope = _factory.Services.CreateScope())
@@ -62,15 +36,17 @@ public class AdminUploadTests : IClassFixture<CustomWebApplicationFactory>
             await db.SaveChangesAsync();
         }
 
-        var form = new MultipartFormDataContent();
-        form.Add(new StringContent("Test Product"), "Name");
-        form.Add(new StringContent("99.99"), "Price");
-        form.Add(new StringContent("Test Description"), "Description");
-        form.Add(new StringContent("SKU-UPLOAD-1"), "Sku");
-        form.Add(new StringContent("5"), "StockQuantity");
-        form.Add(new StringContent("1"), "CategoryId");
+        var response = await client.PostAsJsonAsync("/api/admin/products", new CreateProductDto
+        {
+            Name = "Test Product",
+            Price = 99.99m,
+            Description = "Test Description",
+            Sku = "SKU-UPLOAD-1",
+            StockQuantity = 5,
+            CategoryId = 1,
+            ImageUrl = "https://cdn.example.com/test-product.png"
+        });
 
-        var response = await client.PostAsync("/api/admin/products", form);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
     }
 }

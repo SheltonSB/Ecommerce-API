@@ -21,6 +21,15 @@
 [Dd]ebug/
 [Rr]elease/
 
+# Logs
+logs/
+*.log
+
+# Local databases
+*.db
+*.db-shm
+*.db-wal
+
 # Secrets
 # This will ignore appsettings files for specific environments,
 # preventing local database connection strings from being committed.
@@ -45,3 +54,9 @@ npm-debug.log*
 # This ensures your VITE_API_URL and other potential secrets are never committed.
 .env*
 !.env.example
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml

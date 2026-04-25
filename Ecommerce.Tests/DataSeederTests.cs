@@ -17,7 +17,7 @@ public class DataSeederTests
 
         await using var context = new AppDbContext(options);
 
-        await DataSeeder.SeedAsync(context, NullLoggerFactory.Instance.CreateLogger<DataSeeder>());
+        await DataSeeder.SeedAsync(context, NullLogger.Instance);
 
         (await context.Products.CountAsync()).Should().BeGreaterThan(0);
         (await context.Sales.CountAsync()).Should().BeGreaterThan(0);

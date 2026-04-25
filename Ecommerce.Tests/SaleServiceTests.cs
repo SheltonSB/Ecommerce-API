@@ -56,4 +56,35 @@ public class SaleServiceTests
         completed.Should().BeTrue();
         (await context.Products.FindAsync(product.Id))!.StockQuantity.Should().Be(3);
     }
+
+    [Fact]
+    public async Task AddPayment_Rejects_Duplicate_Payment_For_Same_Sale()
+    {
+        using var context = CreateContext();
+        var category = new Category { Name = "TestCat" };
+        var product = new Product { Name = "Test", Price = 10m, Sku = "SKU-2", StockQuantity = 5, Category = category };
+        context.Categories.Add(category);
+        context.Products.Add(product);
+        await context.SaveChangesAsync();
+
+        var service = new SaleService(context, CreateMapper(), NullLogger<SaleService>.Instance);
+        var sale = await service.CreateAsync(new CreateSaleDto
+        {
+            CustomerName = "Buyer",
+            CustomerEmail = "buyer@example.com",
+            SaleItems = new List<CreateSaleItemDto> { new() { ProductId = product.Id, Quantity = 1 } }
+        });
+
+        var payment = new CreatePaymentInfoDto
+        {
+            PaymentMethod = "CreditCard",
+            Amount = sale.FinalAmount,
+            PaymentReference = "PAY-001"
+        };
+
+        (await service.AddPaymentAsync(sale.Id, payment)).Should().BeTrue();
+
+        var action = async () => await service.AddPaymentAsync(sale.Id, payment);
+        await action.Should().ThrowAsync<InvalidOperationException>();
+    }
 }

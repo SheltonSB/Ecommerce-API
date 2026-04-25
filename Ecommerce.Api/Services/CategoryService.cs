@@ -1,4 +1,3 @@
-using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -13,13 +12,11 @@ namespace Ecommerce.Api.Services;
 public class CategoryService : ICategoryService
 {
     private readonly AppDbContext _context;
-    private readonly IMapper _mapper;
     private readonly ILogger<CategoryService> _logger;
 
-    public CategoryService(AppDbContext context, IMapper mapper, ILogger<CategoryService> logger)
+    public CategoryService(AppDbContext context, ILogger<CategoryService> logger)
     {
         _context = context;
-        _mapper = mapper;
         _logger = logger;
     }
 

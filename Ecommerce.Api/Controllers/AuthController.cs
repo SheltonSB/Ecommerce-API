@@ -134,7 +134,7 @@ public class RegisterUserDtoValidator : AbstractValidator<RegisterDto>
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email is required.")
             .EmailAddress().WithMessage("A valid email is required.")
-            .SetAsyncValidator(new EmailDomainValidator<RegisterDto>())
+            .SetValidator(new EmailDomainValidator<RegisterDto>())
             .WithMessage("Email domain must be valid and able to receive emails.");
 
         RuleFor(x => x.Password)

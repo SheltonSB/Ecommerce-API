@@ -1,4 +1,3 @@
-using AutoMapper;
 using Ecommerce.Api.Contracts;
 using Ecommerce.Api.Data;
 using Ecommerce.Api.Domain;
@@ -19,14 +18,13 @@ public class ProductServicePagingTests
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .Options;
 
-        var config = new MapperConfiguration(cfg => cfg.AddMaps(typeof(Program)));
-        var mapper = config.CreateMapper();
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var cache = new MemoryCacheProvider(memoryCache);
 
         await using var context = new AppDbContext(options);
 
-        context.Categories.Add(new Category { Id = 1, Name = "Cat", CreatedAt = DateTime.UtcNow });
+        var category = new Category { Id = 1, Name = "Cat", CreatedAt = DateTime.UtcNow };
+        context.Categories.Add(category);
         for (var i = 1; i <= 30; i++)
         {
             context.Products.Add(new Product
@@ -36,13 +34,15 @@ public class ProductServicePagingTests
                 Price = i,
                 Sku = $"SKU{i}",
                 StockQuantity = 10,
+                Status = ProductStatus.Active,
                 CategoryId = 1,
+                Category = category,
                 CreatedAt = DateTime.UtcNow
             });
         }
         await context.SaveChangesAsync();
 
-        var service = new ProductService(context, mapper, NullLogger<ProductService>.Instance, cache);
+        var service = new ProductService(context, NullLogger<ProductService>.Instance, cache);
         var request = new PagedRequest { Page = 2, PageSize = 10 };
 
         var result = await service.GetAllAsync(request);

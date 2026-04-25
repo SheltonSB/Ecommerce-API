@@ -9,10 +9,20 @@ namespace Ecommerce.Tests;
 
 public class PostgresContainerFixture : IAsyncLifetime
 {
+    private const string RunContainerTestsVariable = "RUN_CONTAINER_TESTS";
     public PostgreSqlTestcontainer Container { get; private set; } = default!;
+    public bool IsEnabled => string.Equals(
+        Environment.GetEnvironmentVariable(RunContainerTestsVariable),
+        "1",
+        StringComparison.OrdinalIgnoreCase);
 
     public async Task InitializeAsync()
     {
+        if (!IsEnabled)
+        {
+            return;
+        }
+
         Container = new TestcontainersBuilder<PostgreSqlTestcontainer>()
             .WithDatabase(new PostgreSqlTestcontainerConfiguration
             {
@@ -47,6 +57,11 @@ public class PostgresContainerTests : IClassFixture<PostgresContainerFixture>
     [Fact]
     public async Task Migrations_Apply_And_Can_Persist_Product()
     {
+        if (!_fixture.IsEnabled)
+        {
+            return;
+        }
+
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseNpgsql(_fixture.Container.ConnectionString)
             .Options;

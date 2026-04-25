@@ -9,6 +9,8 @@ namespace Ecommerce.Tests;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private readonly string _databaseName = $"InMemoryDbForTesting-{Guid.NewGuid():N}";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
@@ -35,7 +37,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             // Add a new in-memory database context for testing
             services.AddDbContext<AppDbContext>(options =>
-                options.UseInMemoryDatabase("InMemoryDbForTesting"));
+                options.UseInMemoryDatabase(_databaseName));
         });
     }
 }
